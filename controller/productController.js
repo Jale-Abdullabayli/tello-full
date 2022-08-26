@@ -1,14 +1,21 @@
 const Product = require("../model/product");
+const GlobalFilter = require("../utils/GlobalFilter");
+
+
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    let allProducts = new GlobalFilter(Product.find(), req.query);
+    allProducts
+    .filter()
+
+    const products = await allProducts.query;
 
     res.json({
       success: true,
       quantity: products.length,
       data: {
-        products,
+        products
       },
     });
   } catch (error) {
