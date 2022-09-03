@@ -1,48 +1,40 @@
 const Product = require("../model/product");
 const GlobalFilter = require("../utils/GlobalFilter");
+const { asyncCatch } = require("../utils/asyncCatch");
 
 
-
-exports.getAllProducts = async (req, res) => {
-  try {
-    let allProducts = new GlobalFilter(Product.find(), req.query);
-    allProducts
+exports.getAllProducts = asyncCatch(async (req, res) => {
+  let allProducts = new GlobalFilter(Product.find(), req.query);
+  allProducts
     .filter()
 
-    const products = await allProducts.query;
+  const products = await allProducts.query;
 
-    res.json({
-      success: true,
-      quantity: products.length,
-      data: {
-        products
-      },
-    });
-  } catch (error) {
-    res.status(404).json({ success: false, message: error });
-  }
-};
+  res.json({
+    success: true,
+    quantity: products.length,
+    data: {
+      products
+    },
+  });
 
-exports.getOneProduct = async (req, res) => {
-  try {
-    const id = req.params.id;
+})
 
-    const oneProduct = await Product.findById(id);
+exports.getOneProduct = asyncCatch(async (req, res) => {
 
-    if (!oneProduct)
-      return res.status(404).json({
-        success: false,
-        message: "Invalid ID",
-      });
+  const id = req.params.id;
 
-    res.status(200).json({
-      success: true,
-      data: {
-        product: oneProduct,
-      },
-    });
-  } catch (error) {
-    res.status(404).json({ success: false, message: error });
-  }
-};
+  const oneProduct = await Product.findById(id);
+
+  if (!oneProduct) return next(new GlobalError("Invalid Id: FINDONE", 404));
+
+
+  res.status(200).json({
+    success: true,
+    data: {
+      product: oneProduct,
+    },
+  });
+
+})
 
