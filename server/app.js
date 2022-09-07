@@ -5,9 +5,11 @@ const errorHandler = require("./error/errorHandler");
 const GlobalError = require("./error/GlobalError");
 const productsRouter = require("./routes/productRouter");
 const userRouter = require("./routes/userRouter");
+var cors = require('cors')
 
 const app = express();
 app.use(express.json());
+app.use(cors())
 
 app.use("/api/v1/products", productsRouter);
 app.use("/api/v1/users", userRouter);
