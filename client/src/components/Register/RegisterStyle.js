@@ -36,6 +36,9 @@ export const FormContainer = styled.div`
   @media (min-width: 768px) {
     width: 60%;
   }
+  p{
+    margin-bottom:0;
+  }
 `;
 export const Icons = styled.div`
   display: flex;

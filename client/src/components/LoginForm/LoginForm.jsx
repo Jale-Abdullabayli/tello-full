@@ -44,6 +44,15 @@ const LoginForm = () => {
                 placeholder="nümunə@gmail.com"
               />
             </div>
+            <div>
+              <label>Şifrə</label>
+              <input
+                type="password"
+                name=""
+                id=""
+                placeholder="***********"
+              />
+            </div>
             <button>Daxil ol</button>
           </FormStyled>
         </FormContainer>

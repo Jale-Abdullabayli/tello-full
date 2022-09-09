@@ -55,15 +55,7 @@ const Register = () => {
               />
             </div>
 
-            <div>
-              <label>Mobil nömrə</label>
-              <input
-                type="text"
-                name="phone"
-                id="phone"
-                placeholder="077-000 - 00 - 00"
-              />
-            </div>
+          
             <div>
               <label>Şifrə</label>
               <input
@@ -71,6 +63,16 @@ const Register = () => {
                 name=""
                 id="password"
                 placeholder="Şifrənizi daxil edin"
+              />
+            </div>
+
+            <div>
+              <label>Şifrə təkrarı</label>
+              <input
+                type="password"
+                name=""
+                id="passwordConfirm"
+                placeholder="Şifrənizi təkrar daxil edin"
               />
             </div>
 

@@ -12,18 +12,17 @@ import categoryImg1 from "../../assets/images/categoryImg1.png";
 import categoryImg2 from "../../assets/images/categoryImg2.png";
 import categoryImg3 from "../../assets/images/categoryImg3.png";
 
+import { useSelector,useDispatch } from "react-redux";
+import {fetchProducts} from '../../redux/actions/productAction';
 
 const Home = () => {
 
-  const [products, setProducts] = useState([]);
-
+const products=useSelector(state=>state.productReducer.products)
+const dispatch = useDispatch()
 
   useEffect(() => {
-    const fetchData = async () => {
-      const  {data}  = await axios.get('http://127.0.0.1:5000/api/v1/products');
-      setProducts(data.data.products);
-    }
-    fetchData();
+    window.scrollTo(0,0);
+    dispatch(fetchProducts());
   }, []);
   return (
     <>

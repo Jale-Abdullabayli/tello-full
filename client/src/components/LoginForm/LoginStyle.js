@@ -71,6 +71,7 @@ export const FormStyled = styled.form`
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    margin-bottom:10px;
   }
   input {
     background-color: #f2f2f2;
