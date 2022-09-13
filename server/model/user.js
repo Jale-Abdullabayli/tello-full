@@ -1,3 +1,5 @@
+
+const crypto = require("crypto");
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
@@ -18,7 +20,9 @@ const userSchema = mongoose.Schema(
     },
 
     photo: String,
-
+    forgetPassword: {
+      type: String,
+    },
     password: {
       type: String,
       required: [true, "Please provide a password!"],
@@ -35,21 +39,41 @@ const userSchema = mongoose.Schema(
 
         message: "Passwords are not the same",
       },
+      role: {
+        type: String,
+        enum: ["user", "admin", "guide"],
+        default: "user",
+      },
     },
+    resetExpires: Date
   }
 );
 
 userSchema.pre("save", async function (next) {
-    this.passwordConfirm = undefined;
+
+  if (!this.isModified("password")) return next();
+  this.passwordConfirm = undefined;
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-userSchema.methods.checkPassword = async function (
-  realPassword,
-  cryptedPassword
-) {
+userSchema.methods.checkPassword = async function (realPassword, cryptedPassword) {
   return await bcrypt.compare(realPassword.toString(), cryptedPassword);
+};
+
+
+userSchema.methods.generatePassToken = async function () {
+  const resetToken = crypto.randomBytes(48).toString("hex"); 
+
+  const hashPassword = crypto
+    .createHash("md5")
+    .update(resetToken)
+    .digest("hex");
+
+  this.forgetPassword = hashPassword;
+  this.resetExpires = Date.now() + 15 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User = mongoose.model("user", userSchema);

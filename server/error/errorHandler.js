@@ -27,6 +27,14 @@ const handlerCastError = (err) => {
 };
 
 
+const handleTokenExpire = (err) => {
+  return new GlobalError("Session time out. Please Log in again", 403);
+};
+
+const handleTokenError = (err) => {
+  return new GlobalError("Invalid Token", 403);
+};
+
 
 module.exports = (err, req, res, next) => {
   const statusCode = err.statusCode || 500;
@@ -37,6 +45,8 @@ module.exports = (err, req, res, next) => {
     if (err.name === "CastError") {
       err = handlerCastError(err);
     } 
+    else if (err.name === "TokenExpiredError") err = handleTokenExpire(err);
+    else if (err.name === "JsonWebTokenError") err = handleTokenError(err);
     sendProdError(err, req, res);
   }
 };
