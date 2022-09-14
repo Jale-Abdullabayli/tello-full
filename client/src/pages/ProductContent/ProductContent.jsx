@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import ProductGallery from "../../components/ProductGallery/ProductGallery";
 import { useParams } from 'react-router-dom';
 
-import { fetchProductById } from '../../redux/actions/productAction';
+import { fetchProductByIdAsync } from '../../redux/actions/productAction';
 
 const ProductContent = (props) => {
   const product = useSelector(state => state.productByIdReducer.product)
@@ -18,7 +18,7 @@ const ProductContent = (props) => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    dispatch(fetchProductById(id));
+    dispatch(fetchProductByIdAsync(id));
   }, []);
 
 

@@ -13,7 +13,7 @@ import categoryImg2 from "../../assets/images/categoryImg2.png";
 import categoryImg3 from "../../assets/images/categoryImg3.png";
 
 import { useSelector,useDispatch } from "react-redux";
-import {fetchProducts} from '../../redux/actions/productAction';
+import {fetchProductsAsync} from '../../redux/actions/productAction';
 
 const Home = () => {
 
@@ -22,7 +22,7 @@ const dispatch = useDispatch()
 
   useEffect(() => {
     window.scrollTo(0,0);
-    dispatch(fetchProducts());
+    dispatch(fetchProductsAsync());
   }, []);
   return (
     <>
