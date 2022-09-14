@@ -4,7 +4,7 @@ import styles from "./products.module.scss";
 
 import ProductCard from "../ProductCard/ProductCard";
 
-const Products = () => {
+const Products = ({products}) => {
   const [showSorting, setShowSorting] = useState(false);
   const [showFiltering, setShowFiltering] = useState(false);
   return (
@@ -64,11 +64,9 @@ const Products = () => {
         </select>
       </div>
       <div className={styles.products}>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
+        {
+          products.map(product=> <ProductCard product={product}></ProductCard>)
+        }
       </div>
       <div className={styles.productsPagenation}>
         <span className={styles.stepPage}>
