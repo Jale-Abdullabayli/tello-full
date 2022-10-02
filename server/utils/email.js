@@ -11,7 +11,7 @@ const sendEmail = async (option) => {
   });
 
   const mailOptions = {
-    from: "Tello e-commerce",
+    from: "Fikiratr Javadov (fikret@mail.ru)",
     to: option.email,
     subject: option.subject,
     text: option.message,

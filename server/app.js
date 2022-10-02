@@ -5,9 +5,21 @@ const errorHandler = require("./error/errorHandler");
 const GlobalError = require("./error/GlobalError");
 const productsRouter = require("./routes/productRouter");
 const userRouter = require("./routes/userRouter");
+const FAQRouter=require('./routes/FAQRouter');
+const reviewRouter=require('./routes/reviewRouter');
 var cors = require('cors')
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
+const AdminJS = require('adminjs');
+const AdminJSExpress = require('@adminjs/express');
+const AdminJSMongoose = require('@adminjs/mongoose');
+const Product=require('./model/product');
+const FAQ=require('./model/FAQ');
+const Review=require('./model/review');
+const User=require('./model/user');
+
+
+
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -18,6 +30,23 @@ const limiter = rateLimit({
 });
 
 const app = express();
+AdminJS.registerAdapter({
+  Resource: AdminJSMongoose.Resource,
+  Database: AdminJSMongoose.Database,
+})
+
+const adminOptions = {
+  resources: [User,Review,FAQ,Product],
+}
+
+const admin = new AdminJS(adminOptions)
+
+
+
+const adminRouter = AdminJSExpress.buildRouter(admin)
+app.use(admin.options.rootPath, adminRouter)
+
+
 app.use(express.json());
 app.use(cors());
 
@@ -26,6 +55,8 @@ app.use(helmet());
 
 app.use("/api/v1/products", productsRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/FAQ", FAQRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 app.use((req, res, next) => {
   const message = new GlobalError(`The ${req.originalUrl} does not exist`);

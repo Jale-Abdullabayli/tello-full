@@ -24,7 +24,7 @@ exports.getOneProduct = asyncCatch(async (req, res) => {
 
   const id = req.params.id;
 
-  const oneProduct = await Product.findById(id);
+  const oneProduct = await Product.findById(id).populate("reviews");
 
   if (!oneProduct) return next(new GlobalError("Invalid Id: FINDONE", 404));
 

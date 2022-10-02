@@ -10,6 +10,10 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, "Please provide a name!"],
     },
+    surname: {
+      type: String,
+      required: [true, "Please provide a surname!"],
+    },
 
     email: {
       type: String,
@@ -39,11 +43,12 @@ const userSchema = mongoose.Schema(
 
         message: "Passwords are not the same",
       },
-      role: {
-        type: String,
-        enum: ["user", "admin", "guide"],
-        default: "user",
-      },
+
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin", "guide"],
+      default: "user",
     },
     resetExpires: Date
   }
@@ -63,7 +68,7 @@ userSchema.methods.checkPassword = async function (realPassword, cryptedPassword
 
 
 userSchema.methods.generatePassToken = async function () {
-  const resetToken = crypto.randomBytes(48).toString("hex"); 
+  const resetToken = crypto.randomBytes(48).toString("hex");
 
   const hashPassword = crypto
     .createHash("md5")

@@ -28,17 +28,16 @@ const privateRoute = asyncCatch(async (req, res, next) => {
     );
 
   req.user = user;
+
+  console.log(req.user.role);
+  console.log('first')
   next();
 });
 
 const access = (...roles) => {
   return (req, res, next) => {
-    console.log(roles);
-    console.log(req.user.role)
-    console.log(req.user)
-
     if (!roles.includes(req.user.role)) {
-      return next(new GlobalError("You have not permission", 403));
+      return next(new GlobalError("You have not permission", 403)); 
     }
 
     next();

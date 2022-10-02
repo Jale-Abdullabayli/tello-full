@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import authImg from "../../assets/icons/authImg.svg";
 import { BsGoogle } from "react-icons/bs";
 import { FaFacebookF } from "react-icons/fa";
+import { signup } from "../../redux/actions/authAction";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+
 import {
   Container,
   Wrapper,
@@ -11,10 +15,45 @@ import {
   AuthImg,
 } from "./RegisterStyle";
 import { Link } from "react-router-dom";
+import Toastify from "../Toastify/Toastify";
+import { toast } from 'react-toastify';
+
+const formInit = {
+  name: "",
+  email: "",
+  password: "",
+  passwordConfirm: ""
+}
 
 const Register = () => {
+  const [formData, setFormData] = useState(formInit);
+
+  const { error } = useSelector(state => state.authReducer)
+  const dispatch = useDispatch()
+  const navigate = useNavigate();
+
+  const onChangeHandler = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const register = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await dispatch(signup(formData));
+      if (!response?.error) {
+        toast.success('Registered successfully')
+      }
+      else {
+        toast.error(error)
+      }
+    } catch (err) {
+
+    }
+  }
+
   return (
     <Container>
+      <Toastify />
       <Wrapper>
         <FormContainer>
           <h2>Qeydiyyat</h2>
@@ -34,20 +73,23 @@ const Register = () => {
             </div>
           </Icons>
           <p>və ya</p>
-          <FormStyled>
+         
+          <FormStyled onSubmit={register}>
             <div>
-              <label>Ad, Soyad</label>
+              <label>Ad</label>
               <input
+                onChange={onChangeHandler}
                 type="text"
-                name="firstname"
-                id="firstname"
-                placeholder="Ad və soyadınızı daxil edin"
+                name="name"
+                id="name"
+                placeholder="Adınızı daxil edin"
               />
             </div>
 
             <div>
               <label>E-mail</label>
               <input
+                onChange={onChangeHandler}
                 type="email"
                 name="email"
                 id="email"
@@ -55,12 +97,13 @@ const Register = () => {
               />
             </div>
 
-          
+
             <div>
               <label>Şifrə</label>
               <input
+                onChange={onChangeHandler}
                 type="password"
-                name=""
+                name="password"
                 id="password"
                 placeholder="Şifrənizi daxil edin"
               />
@@ -69,8 +112,9 @@ const Register = () => {
             <div>
               <label>Şifrə təkrarı</label>
               <input
+                onChange={onChangeHandler}
                 type="password"
-                name=""
+                name="passwordConfirm"
                 id="passwordConfirm"
                 placeholder="Şifrənizi təkrar daxil edin"
               />

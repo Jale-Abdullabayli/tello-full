@@ -14,12 +14,11 @@ function signJWT(id) {
 }
 
 exports.signup = asyncCatch(async (req, res) => {
-    console.log(req.body)
   const user = await User.create({
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
+    passwordConfirm: req.body.passwordConfirm
   });
 
   const token = signJWT(user._id);
@@ -40,7 +39,7 @@ exports.login = asyncCatch(async (req, res, next) => {
 
   const token = signJWT(user._id);
 
-  res.json({ success: true, data: { token: token } });
+  res.json({ success: true, data: {user, token } });
 });
 
 
@@ -85,7 +84,7 @@ exports.resetPassword = asyncCatch(async (req, res, next) => {
 
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
-  user.resetExpires = undefined;
+  user.resetExpires = undefined;  
   user.forgetPassword = undefined;
   await user.save();
 
@@ -120,3 +119,6 @@ exports.changePassword = asyncCatch(async (req, res, next) => {
     token,
   });
 });
+
+
+

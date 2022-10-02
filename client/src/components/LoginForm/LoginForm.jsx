@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import { BsGoogle } from "react-icons/bs";
 import { FaFacebookF } from "react-icons/fa";
 import authImg from "../../assets/icons/authImg.svg";
@@ -11,10 +11,48 @@ import {
   FormStyled,
   AuthImg,
 } from "./LoginStyle";
+import Toastify from "../Toastify/Toastify";
+import { toast } from 'react-toastify';
+import { signin } from "../../redux/actions/authAction";
+import { useSelector, useDispatch } from "react-redux";
+
+const formInit = {
+  name: "",
+  email: "",
+  password: "",
+  passwordConfirm: ""
+}
 
 const LoginForm = () => {
+
+
+  const [formData, setFormData] = useState(formInit);
+
+  const { error } = useSelector(state => state.authReducer)
+  const dispatch = useDispatch()
+
+  const onChangeHandler = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+  const login = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await dispatch(signin(formData));
+      if (!response?.error) {
+        toast.success('Logined successfully')
+      }
+      else {
+        toast.error(error)
+      }
+    } catch (err) {
+
+    }
+  }
+
   return (
     <Container>
+      <Toastify />
+
       <Wrapper>
         <FormContainer>
           <h2>Daxil ol</h2>
@@ -34,22 +72,24 @@ const LoginForm = () => {
             </div>
           </Icons>
           <p>və ya</p>
-          <FormStyled>
+          <FormStyled onSubmit={login}>
             <div>
               <label>E-mail</label>
               <input
+               onChange={onChangeHandler}
                 type="email"
-                name=""
-                id=""
+                name="email"
+                id="email"
                 placeholder="nümunə@gmail.com"
               />
             </div>
             <div>
               <label>Şifrə</label>
               <input
+               onChange={onChangeHandler}
                 type="password"
-                name=""
-                id=""
+                name="password"
+                id="password"
                 placeholder="***********"
               />
             </div>
