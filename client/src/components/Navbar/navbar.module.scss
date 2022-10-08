@@ -10,10 +10,22 @@
     align-items: center;
     gap: 56px;
     padding: 10px 0px;
-    &>div{
-        cursor: pointer;
-        padding: 3px 5px;
-    }
+    // &>div{
+    //     cursor: pointer;
+    //     padding: 3px 5px;
+    // }
+    a {
+        color: #4f4f4f;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+        text-decoration: none;
+        text-transform: capitalize;
+       &.active{
+        color:#00D68F;
+      }
+      }
+     
 }
 
 @media (max-width: 767px){

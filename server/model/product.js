@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Category = require("./category");
 
 const productSchema = mongoose.Schema({
   name: {
@@ -13,16 +14,6 @@ const productSchema = mongoose.Schema({
     type: Number,
     required: [true, "Product price must be defined!"],
   },
-  size: {
-    type: String,
-    required: [true, "Product size must be defined!"],
-  },
-  colors: [
-   {
-    type: String,
-    required: [true, "Product colors must be defined!"],
-   }
-  ],
   imageCover: {
     type: String,
     required: [true, "Product image cover must be defined!"],
@@ -33,15 +24,21 @@ const productSchema = mongoose.Schema({
   ratingsAverage: {
     type: Number
   },
-  sku: {},
-  categoryId: [
-   { type: mongoose.Schema.Types.ObjectId}
-  ],
+  sku: String,
+  category: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "category",
+    required: [true, "Category id must be defined!"]
+  }],
 
   ratingsQuantity: {
     type: Number,
     default: 0,
-  }
+  },
+  variants: [{
+    variantId: { type: mongoose.Schema.Types.ObjectId, ref: "variant" },
+    values: [String]
+  }]
 
 },
   { timestamps: true, toJSON: { virtuals: true } });
@@ -51,6 +48,27 @@ productSchema.virtual("reviews", {
   foreignField: "product",
   localField: "_id",
 });
+
+
+const increaseCountOfProducts = async (id) => {
+  await Category.findByIdAndUpdate(id, {
+    $inc: { "countOfProducts": 1 }
+  });
+}
+
+productSchema.statics.calcCountOfProductsByCategory = async function (categoryIds) {
+  categoryIds.map(el => increaseCountOfProducts(el));
+};
+
+productSchema.post("save", function (doc) {
+  doc.constructor.calcCountOfProductsByCategory(this.category);
+});
+
+
+productSchema.post(/^findOneAnd/, async function (doc) {
+  doc.constructor.calcCountOfProductsByCategory(this.category);
+});
+
 
 const Product = mongoose.model("product", productSchema);
 

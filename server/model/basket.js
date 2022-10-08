@@ -6,15 +6,13 @@ const basketSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Please provide a userId!"],
         },
-        products:{
+        products: {
             type: [mongoose.Schema.Types.ObjectId],
-            ref:"product"
-        },
-        slug:{
-            type: String,
-            required: [true, "Please provide a slug!"],
+            ref: "product"
         }
-    }
+    }, {
+    timestamps: true,
+}
 );
 
 const Basket = mongoose.model("basket", basketSchema);

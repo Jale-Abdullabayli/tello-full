@@ -57,7 +57,7 @@ const Header = ({ setHamMenu }) => {
               fill="#828282"
             />
           </svg>
-          <input type="text" placeholder="Seacrh..." />
+          <input type="text" placeholder="Search..." />
         </div>
         <div className={styles.listGroup}>
           {/* Login / Register */}

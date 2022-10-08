@@ -24,6 +24,10 @@ const userSchema = mongoose.Schema(
     },
 
     photo: String,
+    phoneNumber: {
+      type:String,
+      required: true
+    },
     forgetPassword: {
       type: String,
     },
@@ -51,7 +55,9 @@ const userSchema = mongoose.Schema(
       default: "user",
     },
     resetExpires: Date
-  }
+  },{
+    timestamps: true,
+}
 );
 
 userSchema.pre("save", async function (next) {

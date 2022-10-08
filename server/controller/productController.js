@@ -1,12 +1,13 @@
 const Product = require("../model/product");
 const GlobalFilter = require("../utils/GlobalFilter");
 const { asyncCatch } = require("../utils/asyncCatch");
+const GlobalError= require('../error/GlobalError');
 
 
 exports.getAllProducts = asyncCatch(async (req, res) => {
   let allProducts = new GlobalFilter(Product.find(), req.query);
   allProducts
-    .filter()
+    .filter().sort().paginate()
 
   const products = await allProducts.query;
 
@@ -38,3 +39,16 @@ exports.getOneProduct = asyncCatch(async (req, res) => {
 
 })
 
+
+
+exports.createProduct = asyncCatch(async (req, res) => {
+  let newProduct = await Product.create(req.body);
+
+  res.json({
+      success: true,
+      data: {
+          newProduct
+      },
+  });
+
+})

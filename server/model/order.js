@@ -5,7 +5,7 @@ const orderSchema = mongoose.Schema(
         status: {
             type: String,
             required: [true, "Please provide a status!"],
-            enum: ["pending", "ship", "pickup", "declined", "refund"]
+            enum: ["pending", "shipping", "canceled","pickup", "declined", "refund"]
         },
         orderItems: [
             {
@@ -18,11 +18,15 @@ const orderSchema = mongoose.Schema(
                 }
             }
         ],
+
+        
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "user"
         }
-    }
+    },{
+        timestamps: true,
+   }
 );
 
 const Order = mongoose.model("order", orderSchema);

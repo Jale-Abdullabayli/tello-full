@@ -36,6 +36,7 @@
     "nodemailer": "^6.7.8",
     "nodemon": "^2.0.19",
     "pug": "^3.0.2",
+    "slugify": "^1.6.5",
     "tslib": "^2.4.0",
     "validator": "^13.7.0"
   }

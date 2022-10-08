@@ -1,12 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import styles from "./products.module.scss";
 
-import ProductCard from "../ProductCard/ProductCard";
+import Pagination from './Pagination/Pagination';
 
-const Products = ({products}) => {
+import ProductCard from "../ProductCard/ProductCard";
+import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import axios from '../../api/index';
+
+
+const Products = () => {
   const [showSorting, setShowSorting] = useState(false);
   const [showFiltering, setShowFiltering] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [countOfProducts, setCountOfProducts] = useState(0);
+  const [category, setCategory] = useState({});
+  const navigate = useNavigate();
+  let { categoryName, page } = useParams();
+
+
+  function changePage(pageNumber) {
+    navigate(`/products/${categoryName}/${pageNumber}`);
+  }
+
+  const getCategory = async () => {
+    const categoryBySlug = await axios.get(`/categories?slug=${categoryName}`);
+    setCategory(categoryBySlug?.data?.data?.categories && categoryBySlug?.data?.data?.categories[0]);
+
+  };
+
+  const sortProducts = async (value) => {
+    const response = await axios.get(`/products?category=${category?._id}&page=${+page}&sort=${value}`);
+    setProducts(response.data.data.products);
+  }
+
+  const getProductsByCategory = async () => {
+    setCountOfProducts(category?.countOfProducts);
+    const response = await axios.get(`/products?category=${category?._id}&page=${+page}`);
+    setProducts(response.data.data.products);
+  }
+
+  useEffect(() => {
+    getProductsByCategory();
+  }, [category]);
+
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    getCategory();
+  }, [page, categoryName]);
+
+
   return (
     <>
       <div className={styles.productsSettings}>
@@ -54,61 +99,22 @@ const Products = ({products}) => {
         </div>
       </div>
       <div className={styles.productsTop}>
-        <p className={styles.productsCount}>287 məhsul tapıldı</p>
+        <p className={styles.productsCount}>{countOfProducts} məhsul tapıldı</p>
         <select
           className={`${styles.mySelectMenu}  ${showSorting && styles.active}`}
+          onChange={(e) => sortProducts(e.target.value)}
         >
-          <option>Option 1</option>
-          <option>Option 2</option>
-          <option>Option 3</option>
+          <option value="price">from cheap to expensive</option>
+          <option value="-price">From expensive to cheap</option>
         </select>
       </div>
       <div className={styles.products}>
         {
-          products.map(product=> <ProductCard product={product}></ProductCard>)
+          products.map(product => <ProductCard key={product._id} product={product}></ProductCard>)
         }
       </div>
-      <div className={styles.productsPagenation}>
-        <span className={styles.stepPage}>
-          <svg
-            width="7"
-            height="10"
-            viewBox="0 0 7 10"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M5.36204 10C5.10004 10 4.83904 9.89801 4.64304 9.69501L0.78004 5.69501C0.40204 5.30201 0.40704 4.67901 0.79304 4.29301L4.79304 0.293006C5.18304 -0.0979941 5.81604 -0.0979941 6.20704 0.293006C6.59704 0.684006 6.59704 1.31601 6.20704 1.70701L2.90204 5.01201L6.08104 8.30501C6.46504 8.70301 6.45404 9.33601 6.05704 9.71901C5.86204 9.90701 5.61204 10 5.36204 10Z"
-              fill="#4F4F4F"
-            />
-          </svg>
-        </span>
-        <span className={styles.page}>1</span>
-        <span className={`${styles.page} ${styles.active}`}>2</span>
-        <span className={styles.page}>3</span>
-        <span className={styles.page}>4</span>
-        <span className={styles.page}>5</span>
-        <span className={styles.page}>6</span>
+      {countOfProducts > 6 && <Pagination changePage={changePage} amount={Math.ceil(countOfProducts / 6)} />}
 
-        <span className={styles.stepPage}>
-          <svg
-            width="7"
-            height="10"
-            viewBox="0 0 7 10"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M1.63796 10C1.89996 10 2.16096 9.89801 2.35696 9.69501L6.21996 5.69501C6.59796 5.30201 6.59296 4.67901 6.20696 4.29301L2.20696 0.293006C1.81696 -0.0979941 1.18396 -0.0979941 0.79296 0.293006C0.40296 0.684006 0.40296 1.31601 0.79296 1.70701L4.09796 5.01201L0.91896 8.30501C0.53496 8.70301 0.54596 9.33601 0.94296 9.71901C1.13796 9.90701 1.38796 10 1.63796 10Z"
-              fill="#4F4F4F"
-            />
-          </svg>
-        </span>
-      </div>
     </>
   );
 };

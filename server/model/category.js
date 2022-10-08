@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const slugify = require('slugify');
 
 const categorySchema = mongoose.Schema(
     {
@@ -6,16 +7,33 @@ const categorySchema = mongoose.Schema(
             type: String,
             required: [true, "Please provide a name!"],
         },
-        parentId:{
+        parentId: {
             type: [mongoose.Schema.Types.ObjectId],
-            ref:"category"
+            ref: "category"
         },
-        slug:{
-            type: String,
-            required: [true, "Please provide a slug!"],
+        slug: {
+            type: String
+        },
+        countOfProducts:{
+            type:Number,
+            default:0
         }
-    }
+    }, {
+    timestamps: true,
+}
 );
+
+
+categorySchema.pre("save", function (next) {
+    if (this.slug) {
+        this.slug = slugify(this.slug);
+    }
+    else {
+        this.slug = slugify(this.name);
+    }
+    next();
+});
+
 
 const Category = mongoose.model("category", categorySchema);
 

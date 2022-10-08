@@ -10,7 +10,9 @@ const FAQSchema = mongoose.Schema(
             type: String,
             required: [true, "Please provide a description!"],
         }
-    }
+    },{
+        timestamps: true,
+   }
 );
 
 const FAQ = mongoose.model("FAQ", FAQSchema);

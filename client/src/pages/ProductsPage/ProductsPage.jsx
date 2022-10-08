@@ -4,18 +4,13 @@ import styles from "./productsPage.module.scss";
 
 import FilterSection from "../../components/FilterSection/FilterSection";
 import Products from "../../components/Products/Products";
-import { useSelector,useDispatch } from "react-redux";
-import {fetchProductsAsync} from '../../redux/actions/productAction';
 
 
 const ProductsPage = () => {
 
-  const products=useSelector(state=>state.productReducer.products)
-  const dispatch = useDispatch()
 
   useEffect(() => {
     window.scrollTo(0,0);
-    dispatch(fetchProductsAsync());
   }, []);
   return (
     <>
@@ -27,7 +22,7 @@ const ProductsPage = () => {
             <FilterSection></FilterSection>
           </div>
           <div className={styles.products}>
-            <Products products={products}></Products>
+            <Products></Products>
           </div>
         </div>
       </div>

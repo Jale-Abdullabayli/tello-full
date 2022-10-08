@@ -23,6 +23,7 @@ const ProductContent = (props) => {
 
 
   if (!product) return <div>Product Not Found</div>
+  console.log(product)
   return (
     <div className={styles.productContentPage}>
       {
@@ -124,6 +125,9 @@ const ProductContent = (props) => {
                 <span>{product.price} ₼</span>
               </div>
               <span className={styles.lineX}></span>
+              {
+                product.variants
+              }
               <div className={styles.productColors}>
                 <h5>Rəng:</h5>
                 <div className={styles.colors}>

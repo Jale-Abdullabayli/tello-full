@@ -16,7 +16,7 @@ const Main = () => {
     <div className="main">
       <Routes>
         <Route path="" element={<Home />} exact></Route>
-        <Route path="products" element={<ProductsPage />}></Route>
+        <Route path="/products/:categoryName/:page" element={<ProductsPage />} />
         <Route path="productContent/:id" element={<ProductContent />}></Route>
         <Route path="asketQuestions" element={<AsketQuestions />}></Route>
         <Route path="login" element={<Login />}></Route>

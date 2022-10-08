@@ -15,6 +15,28 @@ class GlobalFilter {
       );
       this.query = this.query.find(JSON.parse(newQueryStr));
   
+      
+      return this;
+    }
+
+    paginate() {
+      const page = parseInt(this.queryString.page) || 1;
+      const limit = parseInt(this.queryString.limit) || 6;
+      const skip = (page - 1) * limit;
+      this.query.skip(skip).limit(limit);
+  
+      return this;
+    }
+
+    
+    sort() {
+      if (this.queryString.sort) {
+        const mySort = this.queryString.sort.split(",").join(" ");
+        this.query.sort(mySort);
+      } else {
+        this.query.sort("createdAt");
+      }
+  
       return this;
     }
     

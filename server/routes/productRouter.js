@@ -7,7 +7,9 @@ const reviewRouter = require("./reviewRouter");
 
 router.use("/:productId/reviews", reviewRouter);
 
+
 router.get("/", productController.getAllProducts);
+router.post("/", productController.createProduct);
 router.get("/:id", productController.getOneProduct);
 
 module.exports = router;
