@@ -17,7 +17,9 @@ const categorySchema = mongoose.Schema(
         countOfProducts:{
             type:Number,
             default:0
-        }
+        },
+        photo:String,
+        photoId:String
     }, {
     timestamps: true,
 }

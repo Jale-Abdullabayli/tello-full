@@ -87,6 +87,17 @@ const Register = () => {
             </div>
 
             <div>
+              <label>Soyad</label>
+              <input
+                onChange={onChangeHandler}
+                type="text"
+                name="surname"
+                id="surname"
+                placeholder="Soyadınızı daxil edin"
+              />
+            </div>
+
+            <div>
               <label>E-mail</label>
               <input
                 onChange={onChangeHandler}

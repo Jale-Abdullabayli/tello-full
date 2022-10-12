@@ -1,96 +1,130 @@
-@import '../../assets/styles/variables.scss';
+@import "../../assets/styles/variables.scss";
 
-.header{
-    background-color: white;
-    &>div{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-}
-.logo_menu{
+.header {
+  background-color: white;
+  & > div {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 30px;
-    padding: 20px 0px;
+  }
 }
-.menuButton{
-    display: none;
+.logo_menu {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 20px 0px;
 }
-.searchBar{
-    width: 40%;
-    position: relative;
-    input{
-        width: 100%;
-        padding: 10px 20px 10px 60px;
-        background-color: #E0E0E0;
-        border-radius: 8px;
-        border: none;
-    }
-    .searchIcon{
-        position: absolute;
-        top: 50%;
-        left: 30px;
-        transform: translate(-50%,-50%);
-    }
+.menuButton {
+  display: none;
+}
+.searchBar {
+  position: relative;
+  input {
+    width: 100%;
+    padding: 10px 20px 10px 60px;
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    border: none;
+  }
+  .searchIcon {
+    position: absolute;
+    top: 50%;
+    left: 30px;
+    transform: translate(-50%, -50%);
+  }
 }
 
-.listGroup{
-    display: flex;
-    gap: 30px;
-    svg{
-        cursor: pointer;
-    }
-}
-.basketBox{
+.listGroup {
+  display: flex;
+  gap: 30px;
+  svg {
     cursor: pointer;
-    position: relative;
+  }
+}
+.basketBox {
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  span {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: $primary-green;
+    color: white;
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 9px;
-    span{
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: $primary-green;
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: 400;
-        font-size: 12px;
-        line-height: 16px;
-    }
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+  }
 }
 
-@media (max-width: 767px){
-    .header>div{
-        flex-wrap: wrap;
-        flex-direction: row;
+.search {
+  width: 40%;
+  position: relative;
+}
+
+.searchResults {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 2;
+  border: 1px solid #f5f5f5;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  max-height: 300px;
+
+  overflow-y: scroll;
+
+  .searchResult {
+    text-decoration: none;
+    padding: 10px 25px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #f5f5f5;
+    img {
+      width: 50px;
     }
-    .menuButton{
-        display: block;
+    h3 {
+      font-size: 14px;
+      color: #4f4f4f;
+      font-weight: 400;
     }
-    .searchBar{
-        margin-bottom: 20px;
-        order: 3;
-        flex: 1 0 100%;
-        input{
-            padding-left: 44px;
-        }
-        .searchIcon{
-            left: 22px;
-        }
+  }
+}
+@media (max-width: 767px) {
+  .header > div {
+    flex-wrap: wrap;
+    flex-direction: row;
+  }
+  .menuButton {
+    display: block;
+  }
+  .searchBar {
+    margin-bottom: 20px;
+    order: 3;
+    flex: 1 0 100%;
+    input {
+      padding-left: 44px;
     }
-    .listGroup{
-        gap: 13px;
+    .searchIcon {
+      left: 22px;
     }
-    .basketBox{
-        span{
-            position: absolute;
-            transform: translate(-50%,-50%);
-            top: 3px;
-            left: 21px;
-        }
+  }
+  .listGroup {
+    gap: 13px;
+  }
+  .basketBox {
+    span {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      top: 3px;
+      left: 21px;
     }
+  }
 }

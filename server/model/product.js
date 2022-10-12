@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Category = require("./category");
+const Variant = require("./variant");
 
 const productSchema = mongoose.Schema({
   name: {
@@ -18,9 +19,7 @@ const productSchema = mongoose.Schema({
     type: String,
     required: [true, "Product image cover must be defined!"],
   },
-  images: {
-    type: [String]
-  },
+  imageCoverId: String,
   ratingsAverage: {
     type: Number
   },
@@ -37,7 +36,15 @@ const productSchema = mongoose.Schema({
   },
   variants: [{
     variantId: { type: mongoose.Schema.Types.ObjectId, ref: "variant" },
-    values: [String]
+    variantName: String,
+    values: [{
+      name: String,
+      price: Number,
+      images: [{
+        url: String,
+        urlId: String
+      }]
+    }]
   }]
 
 },
@@ -57,7 +64,7 @@ const increaseCountOfProducts = async (id) => {
 }
 
 productSchema.statics.calcCountOfProductsByCategory = async function (categoryIds) {
-  categoryIds.map(el => increaseCountOfProducts(el));
+  categoryIds?.map(el => increaseCountOfProducts(el));
 };
 
 productSchema.post("save", function (doc) {
@@ -69,6 +76,13 @@ productSchema.post(/^findOneAnd/, async function (doc) {
   doc.constructor.calcCountOfProductsByCategory(this.category);
 });
 
+productSchema.pre("save", async function (next) {
+  for (let i = 0; i < this.variants.length; i++) {
+    const variant = await Variant.findById(this.variants[i].variantId);
+    this.variants[i].variantName = variant.name;
+  }
+  next();
+});
 
 const Product = mongoose.model("product", productSchema);
 

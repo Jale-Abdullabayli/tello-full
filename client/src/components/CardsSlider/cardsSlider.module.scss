@@ -9,10 +9,18 @@
       line-height: 28px;
     }
     p {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      margin: 0;
+      a{
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        span {
+          font-weight: 500;
+          font-size: 14px;
+          line-height: 16px;
+          color: #333333;
+          margin-right: 17px;
+        }
+      }
     }
     svg {
       margin-left: 17px;

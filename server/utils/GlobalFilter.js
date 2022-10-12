@@ -28,13 +28,13 @@ class GlobalFilter {
       return this;
     }
 
-    
+
     sort() {
       if (this.queryString.sort) {
         const mySort = this.queryString.sort.split(",").join(" ");
         this.query.sort(mySort);
       } else {
-        this.query.sort("createdAt");
+        this.query.sort("-createdAt");
       }
   
       return this;

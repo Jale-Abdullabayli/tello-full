@@ -1,7 +1,7 @@
 const Category = require("../model/category");
 const { asyncCatch } = require("../utils/asyncCatch");
 const GlobalFilter = require("../utils/GlobalFilter");
-
+const cloudinary = require("../utils/cloudinary");
 
 
 exports.getAllCategories = asyncCatch(async (req, res) => {
@@ -21,7 +21,12 @@ exports.getAllCategories = asyncCatch(async (req, res) => {
 
 
 exports.createCategory = asyncCatch(async (req, res) => {
-    let newCategory = await Category.create(req.body);
+    const data = await cloudinary.uploader.upload(req.file.path,{public_id: `tello/categoryImages/${req.body.name}`});
+
+    let newCategory = await Category.create({
+        ...req.body, photo: data.secure_url,
+        photoId: data.public_id
+    });
 
     res.json({
         success: true,

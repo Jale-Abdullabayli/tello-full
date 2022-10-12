@@ -6,10 +6,13 @@ const basketSchema = mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             required: [true, "Please provide a userId!"],
         },
-        products: {
-            type: [mongoose.Schema.Types.ObjectId],
-            ref: "product"
-        }
+        products: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "product",
+                quantity: Number
+            }
+        ]
     }, {
     timestamps: true,
 }

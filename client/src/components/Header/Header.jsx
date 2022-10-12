@@ -1,11 +1,57 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./header.module.scss";
 import { ReactComponent as Logo } from "../../assets/icons/logo.svg";
 import { ReactComponent as Favorite } from "../../assets/icons/fav.svg";
 import { ReactComponent as User } from "../../assets/icons/user.svg";
 import { Link } from "react-router-dom";
+import axios from '../../api/index';
+
 
 const Header = ({ setHamMenu }) => {
+
+  const [products, setProducts] = useState([]);
+  const resultRef = useRef(null);
+  const [showResults, setShowResults] = useState(true);
+
+
+  let interval;
+
+  async function searchProducts(value) {
+    const response = await axios.get(`/products/search/${value}`);
+    setProducts(response?.data?.data?.products);
+  }
+
+
+  async function keyUp(value) {
+    clearInterval(interval);
+    let counter = 0;
+    value = value.trim();
+    if (value === "") {
+      setProducts([]);
+      return;
+    };
+    interval = setInterval(() => {
+      counter++;
+      if (counter >= 1) {
+        clearInterval(interval);
+        searchProducts(value);
+        setShowResults(true);
+
+      }
+    }, 500);
+  };
+
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+
+      if (!resultRef.current?.contains(event.target)) {
+        setShowResults(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className={styles.header}>
       <div className="container">
@@ -39,25 +85,38 @@ const Header = ({ setHamMenu }) => {
             <Logo />
           </Link>
         </div>
-        <div className={styles.searchBar}>
-          <svg
-            className={styles.searchIcon}
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M7.66671 14.5C3.90004 14.5 0.833374 11.4333 0.833374 7.66668C0.833374 3.90001 3.90004 0.833344 7.66671 0.833344C11.4334 0.833344 14.5 3.90001 14.5 7.66668C14.5 11.4333 11.4334 14.5 7.66671 14.5ZM7.66671 1.83334C4.44671 1.83334 1.83337 4.45334 1.83337 7.66668C1.83337 10.88 4.44671 13.5 7.66671 13.5C10.8867 13.5 13.5 10.88 13.5 7.66668C13.5 4.45334 10.8867 1.83334 7.66671 1.83334Z"
-              fill="#828282"
-            />
-            <path
-              d="M14.6666 15.1667C14.54 15.1667 14.4133 15.12 14.3133 15.02L12.98 13.6867C12.7866 13.4933 12.7866 13.1733 12.98 12.98C13.1733 12.7867 13.4933 12.7867 13.6866 12.98L15.02 14.3133C15.2133 14.5067 15.2133 14.8267 15.02 15.02C14.92 15.12 14.7933 15.1667 14.6666 15.1667Z"
-              fill="#828282"
-            />
-          </svg>
-          <input type="text" placeholder="Search..." />
+        <div className={styles.search}>
+          <div className={styles.searchBar}>
+            <svg
+              className={styles.searchIcon}
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M7.66671 14.5C3.90004 14.5 0.833374 11.4333 0.833374 7.66668C0.833374 3.90001 3.90004 0.833344 7.66671 0.833344C11.4334 0.833344 14.5 3.90001 14.5 7.66668C14.5 11.4333 11.4334 14.5 7.66671 14.5ZM7.66671 1.83334C4.44671 1.83334 1.83337 4.45334 1.83337 7.66668C1.83337 10.88 4.44671 13.5 7.66671 13.5C10.8867 13.5 13.5 10.88 13.5 7.66668C13.5 4.45334 10.8867 1.83334 7.66671 1.83334Z"
+                fill="#828282"
+              />
+              <path
+                d="M14.6666 15.1667C14.54 15.1667 14.4133 15.12 14.3133 15.02L12.98 13.6867C12.7866 13.4933 12.7866 13.1733 12.98 12.98C13.1733 12.7867 13.4933 12.7867 13.6866 12.98L15.02 14.3133C15.2133 14.5067 15.2133 14.8267 15.02 15.02C14.92 15.12 14.7933 15.1667 14.6666 15.1667Z"
+                fill="#828282"
+              />
+            </svg>
+            <input type="text" placeholder="Search..." onKeyUp={(e) => keyUp(e.target.value)} />
+          </div>
+          <div ref={resultRef} className={styles.searchResults}>
+            {
+              showResults && 
+              products?.map((product) => (
+                <Link to={`/productContent/${product.id}`} className={styles.searchResult}>
+                  <img src={product.imageCover} alt="productImg" />
+                  <h3 className='name'>{`${product.name},`} </h3>
+                </Link>
+              ))
+            }
+          </div>
         </div>
         <div className={styles.listGroup}>
           {/* Login / Register */}

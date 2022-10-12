@@ -3,7 +3,7 @@ import { fetchProductByIdAsync } from '../actions/productAction';
 
 const initialState = {
     loading: false,
-    product: [],
+    product: {},
     error: null
 };
 

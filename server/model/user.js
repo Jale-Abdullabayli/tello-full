@@ -24,10 +24,7 @@ const userSchema = mongoose.Schema(
     },
 
     photo: String,
-    phoneNumber: {
-      type:String,
-      required: true
-    },
+   
     forgetPassword: {
       type: String,
     },

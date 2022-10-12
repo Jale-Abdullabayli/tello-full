@@ -17,6 +17,7 @@ const Products = () => {
   const [countOfProducts, setCountOfProducts] = useState(0);
   const [category, setCategory] = useState({});
   const navigate = useNavigate();
+  const [sortText, setSortText] = useState("-createdAt");
   let { categoryName, page } = useParams();
 
 
@@ -27,17 +28,12 @@ const Products = () => {
   const getCategory = async () => {
     const categoryBySlug = await axios.get(`/categories?slug=${categoryName}`);
     setCategory(categoryBySlug?.data?.data?.categories && categoryBySlug?.data?.data?.categories[0]);
-
   };
 
-  const sortProducts = async (value) => {
-    const response = await axios.get(`/products?category=${category?._id}&page=${+page}&sort=${value}`);
-    setProducts(response.data.data.products);
-  }
 
   const getProductsByCategory = async () => {
     setCountOfProducts(category?.countOfProducts);
-    const response = await axios.get(`/products?category=${category?._id}&page=${+page}`);
+    const response = await axios.get(`/products?category=${category?._id}&page=${+page}&sort=${sortText}`);
     setProducts(response.data.data.products);
   }
 
@@ -47,7 +43,7 @@ const Products = () => {
 
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    window.scrollTo(0, 0);
     getCategory();
   }, [page, categoryName]);
 
@@ -102,7 +98,7 @@ const Products = () => {
         <p className={styles.productsCount}>{countOfProducts} məhsul tapıldı</p>
         <select
           className={`${styles.mySelectMenu}  ${showSorting && styles.active}`}
-          onChange={(e) => sortProducts(e.target.value)}
+          onChange={(e) => setSortText(e.target.value)}
         >
           <option value="price">from cheap to expensive</option>
           <option value="-price">From expensive to cheap</option>

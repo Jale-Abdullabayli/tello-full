@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import styles from "./home.module.scss";
 
 import ReviewSlider from "../../components/ReviewSlider/ReviewSlider";
 import CardsSlider from "../../components/CardsSlider/CardsSlider";
+import { Link } from 'react-router-dom';
 
 import addImg1 from "../../assets/images/AddImg1.png";
 import addImg2 from "../../assets/images/AddImg2.png";
@@ -11,38 +12,65 @@ import categoryImg1 from "../../assets/images/categoryImg1.png";
 import categoryImg2 from "../../assets/images/categoryImg2.png";
 import categoryImg3 from "../../assets/images/categoryImg3.png";
 
-import { useSelector,useDispatch } from "react-redux";
-import {fetchProductsAsync} from '../../redux/actions/productAction';
+import { useSelector, useDispatch } from "react-redux";
+import { fetchProductsAsync } from '../../redux/actions/productAction';
+import axios from '../../api/index';
 
 const Home = () => {
 
-const products=useSelector(state=>state.productReducer.products)
-const dispatch = useDispatch()
+  const products = useSelector(state => state.productReducer.products.slice(0, 4));
+  const [accessories, setAccessories] = useState([]);
+  const [phonesCategory, setPhonesCategory] = useState({});
+  const [accessoriesCategory, setAccessoriesCategory] = useState({});
+  const [smartWatchCategory, setSmartWatchCategory] = useState({});
+
+  const dispatch = useDispatch()
+
+  const getCategory = async (slug) => {
+    const categoryBySlug = await axios.get(`/categories?slug=${slug}`);
+    return categoryBySlug?.data?.data?.categories && categoryBySlug?.data?.data?.categories[0];
+  };
+
+  const getProductsByCategory = async () => {
+    const category = await getCategory("aksesuarlar");
+    const response = await axios.get(`/products?category=${category?._id}&limit=4`);
+    setAccessories(response.data.data.products);
+  }
+
+
+  async function getSpecificCategories(){
+    setPhonesCategory(await getCategory("telefonlar"));
+    console.log(phonesCategory);
+    setAccessoriesCategory(await getCategory("aksesuarlar"));
+    setSmartWatchCategory(await getCategory("smart-saat"));
+  }
 
   useEffect(() => {
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
     dispatch(fetchProductsAsync());
+    getProductsByCategory();
+    getSpecificCategories();
   }, []);
   return (
     <>
       <ReviewSlider />
-      <CardsSlider products={products} />
-      <CardsSlider products={products} />
+      <CardsSlider title='Ən çox satılan məhsullar' products={products} />
+      <CardsSlider title='Yeni gələn məhsullar' products={products} />
       <div className="container">
         <div className={styles.addsBox}>
           <img src={addImg1} alt="" />
           <img src={addImg2} alt="" />
         </div>
       </div>
-      <CardsSlider products={products} />
+      <CardsSlider permalink='aksesuarlar' title='Yeni gələn aksessuarlar' products={accessories} />
       <div className="container">
         <div className={styles.categories}>
           <div className={styles.leftCat}>
             <div className={`${styles.category} ${styles.bigCat}`}>
               <div className={styles.firstSide}>
-                <h3>Telefon</h3>
-                <p>Məhsul sayı: 322</p>
-                <p style={{ color: "#3366FF" }}>
+                <h3>{phonesCategory?.name}</h3>
+                <p>Məhsul sayı: {phonesCategory?.countOfProducts}</p>
+                <Link to={`/products/${phonesCategory.slug}/1`} style={{ color: "#3366FF" }}>
                   Hamısına bax
                   <svg
                     width="7"
@@ -58,19 +86,19 @@ const dispatch = useDispatch()
                       fill="#3366FF"
                     />
                   </svg>
-                </p>
+                </Link>
               </div>
               <div className={styles.secondSide}>
-                <img src={categoryImg1} alt="" />
+                <img src={phonesCategory.photo} alt="" />
               </div>
             </div>
           </div>
           <div className={styles.rightCat}>
             <div className={`${styles.category} ${styles.smallCat}`}>
               <div className={styles.firstSide}>
-                <h3>Telefon</h3>
-                <p>Məhsul sayı: 322</p>
-                <p style={{ color: "#3366FF" }}>
+              <h3>{accessoriesCategory?.name}</h3>
+                <p>Məhsul sayı: {accessoriesCategory?.countOfProducts}</p>
+                <Link to={`/products/${accessoriesCategory.slug}/1`} style={{ color: "#3366FF" }}>
                   Hamısına bax
                   <svg
                     width="7"
@@ -86,17 +114,17 @@ const dispatch = useDispatch()
                       fill="#3366FF"
                     />
                   </svg>
-                </p>
+                </Link>
               </div>
               <div className={styles.secondSide}>
-                <img src={categoryImg2} alt="" />
+                <img src={accessoriesCategory.photo} alt="" />
               </div>
             </div>
             <div className={`${styles.category} ${styles.smallCat}`}>
               <div className={styles.firstSide}>
-                <h3>Telefon</h3>
-                <p>Məhsul sayı: 322</p>
-                <p style={{ color: "#3366FF" }}>
+              <h3>{smartWatchCategory?.name}</h3>
+                <p>Məhsul sayı: {smartWatchCategory?.countOfProducts}</p>
+                <Link to={`/products/${smartWatchCategory.slug}/1`} style={{ color: "#3366FF" }}>
                   Hamısına bax
                   <svg
                     width="7"
@@ -112,10 +140,10 @@ const dispatch = useDispatch()
                       fill="#3366FF"
                     />
                   </svg>
-                </p>
+                </Link>
               </div>
               <div className={styles.secondSide}>
-                <img src={categoryImg3} alt="" />
+                <img src={smartWatchCategory.photo} alt="" />
               </div>
             </div>
           </div>

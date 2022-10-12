@@ -11,149 +11,151 @@ import { fetchProductByIdAsync } from '../../redux/actions/productAction';
 
 const ProductContent = (props) => {
   const product = useSelector(state => state.productByIdReducer.product)
-  const dispatch = useDispatch()
-
+  const dispatch = useDispatch();
+  const [activeColorIndex, setActiveColorIndex] = useState(0);
+  const [activeSizeIndex, setActiveSizeIndex] = useState(0);
+  const [colorVariants, setColorVariants] = useState([]);
+  const [sizeVariants, setSizeVariants] = useState([]);
+  const [activeSliderImages, setActiveSliderImages] = useState([]);
   const [technicalBtn, setTechnicalBtn] = useState(true);
+  const [rating, setRating] = useState([]);
+  const [emptyRatingStars, setEmptyRatingStars] = useState([]);
+  let [basketCount, setbasketCount] = useState(1);
+
   let { id } = useParams();
 
   useEffect(() => {
     window.scrollTo(0, 0);
     dispatch(fetchProductByIdAsync(id));
+
   }, []);
 
+  useEffect(() => {
+    product?.variants?.forEach(el => {
+      if (el.variantName === "color") setColorVariants(el.values);
+      else if (el.variantName === "size") setSizeVariants(el.values);
+    })
+    setRating([]);
+    setEmptyRatingStars([])
+    for (let i = 0; i < Math.round(product?.ratingsAverage); i++) {
+      setRating(rating => [...rating, 1])
+    }
+
+    for (let i = 0; i < 5 - Math.round(product?.ratingsAverage); i++) {
+      setEmptyRatingStars(rating => [...rating, 1])
+    }
+  }, [product]);
+
+
+  useEffect(() => {
+    setActiveSliderImages(colorVariants[activeColorIndex]?.images.map(el => {
+      return el.url
+    }))
+
+  }, [colorVariants, activeColorIndex]);
+
+
+  useEffect(() => {
+   setbasketCount(1);
+  }, [activeColorIndex,activeSizeIndex]);
+  function decrementBasketCount() {
+    if (basketCount !== 1) setbasketCount(basketCount - 1);
+  }
+
+  function incrementBasketCount() {
+    setbasketCount(basketCount + 1);
+  }
 
   if (!product) return <div>Product Not Found</div>
-  console.log(product)
   return (
     <div className={styles.productContentPage}>
       {
         product && <div className="container">
           <div className={styles.mainInfo}>
             <div className={styles.productImages}>
-              <ProductGallery images={product?.images} />
+              <ProductGallery images={activeSliderImages} />
             </div>
             <div className={styles.productContent}>
               <h2>
-                {product.name}
+                {`${product.name} ${sizeVariants[activeSizeIndex]?.name} ${colorVariants[activeColorIndex]?.name}`}
               </h2>
               <div className={styles.productRatings}>
                 <div className={styles.stars}>
-                  <span className={styles.star}>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                        fill="#F2994A"
-                        stroke="#F2994A"
-                      />
-                    </svg>
-                  </span>
-                  <span className={styles.star}>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                        fill="#F2994A"
-                        stroke="#F2994A"
-                      />
-                    </svg>
-                  </span>
-                  <span className={styles.star}>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                        fill="#F2994A"
-                        stroke="#F2994A"
-                      />
-                    </svg>
-                  </span>
-                  <span className={styles.star}>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                        fill="#F2994A"
-                        stroke="#F2994A"
-                      />
-                    </svg>
-                  </span>
-                  <span className={styles.star}>
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                        fill="white"
-                        stroke="#F2994A"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
+                  {
+                    rating.map(el => {
+                      return <span className={styles.star}>
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
+                            fill="#F2994A"
+                            stroke="#F2994A"
+                          />
+                        </svg>
+                      </span>
+                    })
+                  }
+                  {
+                    emptyRatingStars.map(el => {
+                      return <span className={styles.star}>
+                        <svg
+                          width="18"
+                          height="18"
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
+                            fill="white"
+                            stroke="#F2994A"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    })
+                  }
                 </div>
-                <p className={styles.ratesCount}>(226)</p>
+                <p className={styles.ratesCount}>({product?.ratingsQuantity})</p>
                 <span className={styles.lineY}></span>
-                <p className={styles.commentCount}>57 rəy</p>
+                <p className={styles.commentCount}>{product?.reviews?.length} rəy</p>
               </div>
               <div className={styles.productPrice}>
-                <del>{product.price} ₼</del>
-                <span>{product.price} ₼</span>
+                {/* <del>{product.price} ₼</del> */}
+                <span>{sizeVariants[activeSizeIndex]?.price} ₼</span>
               </div>
               <span className={styles.lineX}></span>
-              {
-                product.variants
-              }
+
               <div className={styles.productColors}>
                 <h5>Rəng:</h5>
                 <div className={styles.colors}>
-                  {product?.colors?.map((color, index) => {
+                  {colorVariants?.map((el, index) => {
                     return <span
                       key={index}
-                      className={styles.color}
-                      style={{ backgroundColor: color }}
+                      onClick={() => setActiveColorIndex(index)}
+                      className={activeColorIndex === index ? `${styles.active} ${styles.color}` : styles.color}
+                      style={{ backgroundColor: el.name }}
                     ></span>
                   })}
                 </div>
               </div>
               <div className={styles.productCapacities}>
                 <h5>Yaddaş:</h5>
-                {/* <span
-                className={styles.capacity}
-                style={{ backgroundColor: "#4F4F4F", color: "#FFFFFF" }}
-              >
-                256GB
-              </span> */}
-                {product?.sizes?.map((size, index) => <span key={index} className={styles.capacity}>{size}</span>)}
+
+                {sizeVariants?.map((size, index) => <span key={index} onClick={() => setActiveSizeIndex(index)}
+                  className={activeSizeIndex === index ? `${styles.active} ${styles.capacity}` : styles.capacity}
+                >{size.name}</span>)}
 
               </div>
               <span className={styles.lineX}></span>
               <div className={styles.productCount}>
-                <span>
+                <span onClick={decrementBasketCount}>
                   <svg
                     width="10"
                     height="10"
@@ -170,8 +172,8 @@ const ProductContent = (props) => {
                     />
                   </svg>
                 </span>
-                <p>1</p>
-                <span>
+                <p>{basketCount}</p>
+                <span onClick={incrementBasketCount}>
                   <svg
                     width="10"
                     height="10"
@@ -236,7 +238,7 @@ const ProductContent = (props) => {
               </div>
             </div>
           </div>
-          <div className={styles.additionalInfo}>
+          {/* <div className={styles.additionalInfo}>
             <div
               className={`${styles.generalInfo} ${!technicalBtn && styles.active
                 }`}
@@ -772,7 +774,7 @@ const ProductContent = (props) => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
           <div className={styles.addComment}>
             <form action="">
               <div className={styles.inputBox}>
