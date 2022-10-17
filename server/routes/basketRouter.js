@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const basketController=require('../controller/basketController');
+const basketController = require('../controller/basketController');
+const { privateRoute } = require("../middleware/privateRoute");
 
 
+router.get("/", privateRoute, basketController.getBasket);
+router.post("/", privateRoute, basketController.addProductToBasket);
+router.delete("/:id", privateRoute, basketController.removeProductFromBasket);
 
 
 module.exports = router;

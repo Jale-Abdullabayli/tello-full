@@ -2,13 +2,13 @@ import React from "react";
 
 import styles from "./basketCalc.module.scss";
 
-const BasketCalc = () => {
+const BasketCalc = ({totalPrice}) => {
   return (
     <div className={styles.calcBox}>
       <h4>Ümumi</h4>
       <div className={styles.calcRow}>
         <p>Məbləğ</p>
-        <p>66.50 ₼</p>
+        <p>{totalPrice} ₼</p>
       </div>
       <div className={styles.calcRow}>
         <p>Çatdırılma</p>
@@ -16,7 +16,7 @@ const BasketCalc = () => {
       </div>
       <div className={styles.calcRow}>
         <p>Hədiyyə paketi</p>
-        <p>5.00 ₼</p>
+        <p>0.00 ₼</p>
       </div>
       <div className={styles.calcRow}>
         <p>Promo kod</p>
@@ -25,7 +25,7 @@ const BasketCalc = () => {
       <span className={styles.lineX}></span>
       <div className={styles.totalCalc}>
         <p>Cəmi</p>
-        <span>61.50 ₼</span>
+        <span>{totalPrice} ₼</span>
       </div>
     </div>
   );

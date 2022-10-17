@@ -12,7 +12,7 @@ const Header = ({ setHamMenu }) => {
   const [products, setProducts] = useState([]);
   const resultRef = useRef(null);
   const [showResults, setShowResults] = useState(true);
-
+const [basket, setBasket] = useState({});
 
   let interval;
 
@@ -41,8 +41,13 @@ const Header = ({ setHamMenu }) => {
     }, 500);
   };
 
+  async function getBasket() {
+    const response = await axios.get('/basket');
+    setBasket(response.data.data.basket)
+  }
 
   useEffect(() => {
+    getBasket();
     function handleClickOutside(event) {
 
       if (!resultRef.current?.contains(event.target)) {
@@ -50,6 +55,7 @@ const Header = ({ setHamMenu }) => {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
+
   }, []);
 
   return (
@@ -108,7 +114,7 @@ const Header = ({ setHamMenu }) => {
           </div>
           <div ref={resultRef} className={styles.searchResults}>
             {
-              showResults && 
+              showResults &&
               products?.map((product) => (
                 <Link to={`/productContent/${product.id}`} className={styles.searchResult}>
                   <img src={product.imageCover} alt="productImg" />
@@ -125,7 +131,7 @@ const Header = ({ setHamMenu }) => {
           </Link>
           {/* Fav */}
           <Favorite />
-          <Link to="basket">
+          <Link to='basket' state={basket}>
             <div className={styles.basketBox}>
               <svg
                 width="24"
@@ -141,7 +147,7 @@ const Header = ({ setHamMenu }) => {
                   fill="#4F4F4F"
                 />
               </svg>
-              <span>0</span>
+              <span>{basket?.totalCount}</span>
             </div>
           </Link>
         </div>

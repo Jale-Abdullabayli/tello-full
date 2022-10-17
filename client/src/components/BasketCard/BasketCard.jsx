@@ -1,13 +1,31 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 
 import styles from "./basketCard.module.scss";
+import axios from '../../api/index';
 
-import productImg from "../../assets/images/productImg.png";
 
-const BasketCard = () => {
+
+const BasketCard = ({ basketProduct,setBasket }) => {
+  const { quantity, variants, price,_id, photo, name } = basketProduct;
   const [mark, setMark] = useState(true);
 
-  const [productCount, setProductCount] = useState(1);
+  const [productCount, setProductCount] = useState(quantity);
+  const [productVariants, setProductVariants] = useState({});
+
+  async function removeProductFromBasket(){
+    const response = await axios.delete(`/basket/${_id}`);
+    setBasket(response.data.data.basket)
+  }
+
+useEffect(() => {
+  const variantObj={};
+  variants.forEach(el => {
+    let name = el.name;
+    let value = el.value;
+    variantObj[name]= value;
+  })
+  setProductVariants(variantObj);
+}, []);
 
   const increase = () => {
     setProductCount(productCount + 1);
@@ -23,24 +41,24 @@ const BasketCard = () => {
         onClick={() => setMark(!mark)}
       ></div>
       <div className={styles.productImg}>
-        <img src={productImg} alt="" />
+        <img src={photo} alt="" />
       </div>
       <div className={styles.productContent}>
         <h3 className={styles.productName}>
-          iPhone 12, 64 GB, Bənövşəyi, (MJNM3) Golden 5 G 8690604083886 0212042
+          {name} {productVariants.size} {productVariants.color}
         </h3>
         <p className={styles.productColor}>
           <span>Rəng:</span>
-          Bənövşəyi
+          {productVariants?.color}
         </p>
         <div className={styles.productPrice}>
-          <del>3012 ₼</del>
-          <span>2089 ₼</span>
+          {/* <del>3012 ₼</del> */}
+          <span>{price} ₼</span>
         </div>
       </div>
       <div className={styles.productPrice}>
-        <del>3012 ₼</del>
-        <span>2089 ₼</span>
+        {/* <del>3012 ₼</del> */}
+        <span>{price} ₼</span>
       </div>
       <div className={styles.productCounter}>
         <span onClick={() => decrease()}>
@@ -87,6 +105,7 @@ const BasketCard = () => {
         </span>
       </div>
       <svg
+      onClick={removeProductFromBasket}
         className={styles.deleteProduct}
         width="18"
         height="20"
