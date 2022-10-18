@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./footer.module.scss";
+import {Link} from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -171,7 +172,7 @@ const Footer = () => {
                     <h4>Kömək</h4>
                   </li>
                   <li>
-                    <a href="">Tez-tez soruşulan suallar</a>
+                    <Link to="/asketQuestions">Tez-tez soruşulan suallar</Link>
                   </li>
                   <li>
                     <a href="">Çatdırılma xidməti</a>

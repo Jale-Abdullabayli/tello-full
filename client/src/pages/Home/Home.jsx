@@ -40,7 +40,6 @@ const Home = () => {
 
   async function getSpecificCategories(){
     setPhonesCategory(await getCategory("telefonlar"));
-    console.log(phonesCategory);
     setAccessoriesCategory(await getCategory("aksesuarlar"));
     setSmartWatchCategory(await getCategory("smart-saat"));
   }

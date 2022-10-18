@@ -11,7 +11,6 @@ import {
   FormStyled,
   AuthImg,
 } from "./LoginStyle";
-import Toastify from "../Toastify/Toastify";
 import { toast } from 'react-toastify';
 import { signin } from "../../redux/actions/authAction";
 import { useSelector, useDispatch } from "react-redux";
@@ -51,7 +50,6 @@ const LoginForm = () => {
 
   return (
     <Container>
-      <Toastify />
 
       <Wrapper>
         <FormContainer>

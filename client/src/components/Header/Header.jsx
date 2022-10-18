@@ -5,6 +5,8 @@ import { ReactComponent as Favorite } from "../../assets/icons/fav.svg";
 import { ReactComponent as User } from "../../assets/icons/user.svg";
 import { Link } from "react-router-dom";
 import axios from '../../api/index';
+import { useDispatch, useSelector } from 'react-redux';
+import { getBasketAsync } from '../../redux/actions/basketAction';
 
 
 const Header = ({ setHamMenu }) => {
@@ -12,8 +14,12 @@ const Header = ({ setHamMenu }) => {
   const [products, setProducts] = useState([]);
   const resultRef = useRef(null);
   const [showResults, setShowResults] = useState(true);
-const [basket, setBasket] = useState({});
 
+  const dispatch = useDispatch();
+
+  const basket = useSelector(state => {
+    return state.basketReducer.basket;
+  });
   let interval;
 
   async function searchProducts(value) {
@@ -41,13 +47,12 @@ const [basket, setBasket] = useState({});
     }, 500);
   };
 
-  async function getBasket() {
-    const response = await axios.get('/basket');
-    setBasket(response.data.data.basket)
-  }
+ 
 
   useEffect(() => {
-    getBasket();
+    dispatch(getBasketAsync());
+    window.scrollTo(0, 0);
+   
     function handleClickOutside(event) {
 
       if (!resultRef.current?.contains(event.target)) {
@@ -131,7 +136,7 @@ const [basket, setBasket] = useState({});
           </Link>
           {/* Fav */}
           <Favorite />
-          <Link to='basket' state={basket}>
+          <Link to='basket'>
             <div className={styles.basketBox}>
               <svg
                 width="24"

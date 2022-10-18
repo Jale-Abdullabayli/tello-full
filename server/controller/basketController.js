@@ -20,7 +20,7 @@ exports.addProductToBasket = asyncCatch(async (req, res) => {
 
     const userId = req.user._id;
 
-    const { productId, quantity, variants, price,name,photo } = req.body;
+    const { productId, quantity, variants, price, name, photo } = req.body;
 
     let basket = await Basket.findOne({ userId });
 
@@ -50,7 +50,7 @@ exports.addProductToBasket = asyncCatch(async (req, res) => {
             productItem.quantity = quantity;
             basket.products[itemIndex] = productItem;
         } else {
-            basket.products.push({ productId, quantity, variants, price,name,photo  });
+            basket.products.push({ productId, quantity, variants, price, name, photo });
         }
         basket = await basket.save();
         return res.status(200).json({
@@ -63,7 +63,7 @@ exports.addProductToBasket = asyncCatch(async (req, res) => {
     else {
         const basket = await Basket.create({
             userId,
-            products: [{ productId, quantity, variants, price,name,photo  }]
+            products: [{ productId, quantity, variants, price, name, photo }]
         });
         return res.status(200).json({
             success: true,
@@ -81,11 +81,11 @@ exports.addProductToBasket = asyncCatch(async (req, res) => {
 
 exports.removeProductFromBasket = asyncCatch(async (req, res) => {
 
-    const id=req.params.id;
+    const id = req.params.id;
     const userId = req.user._id;
     let basket = await Basket.findOne({ userId });
 
-    basket.products=basket.products.filter(product=>product._id!=id);
+    basket.products = basket.products.filter(product => product._id != id);
 
     basket = await basket.save();
     res.json({
@@ -95,5 +95,46 @@ exports.removeProductFromBasket = asyncCatch(async (req, res) => {
         },
     });
 
+
+})
+
+
+exports.updateBasket = asyncCatch(async (req, res) => {
+    const userId = req.user._id;
+    let basket = await Basket.findOne({ userId });
+
+    const { id, quantity } = req.body;
+
+    const itemIndex = basket.products.findIndex((p) => p._id == id);
+    const productItem = basket.products[itemIndex];
+    productItem.quantity = quantity;
+    basket.products[itemIndex] = productItem;
+
+    basket = await basket.save();
+    res.json({
+        success: true,
+        data: {
+            basket
+        },
+    });
+
+
+})
+
+
+exports.clearBasket = asyncCatch(async (req, res) => {
+    const userId = req.user._id;
+    let basket = await Basket.findOne({ userId });
+
+    basket.products = [];
+    basket = await basket.save();
+
+
+    res.json({
+        success: true,
+        data: {
+            basket
+        },
+    });
 
 })

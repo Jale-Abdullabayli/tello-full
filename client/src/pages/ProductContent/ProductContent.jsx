@@ -8,6 +8,9 @@ import ProductGallery from "../../components/ProductGallery/ProductGallery";
 import { useParams } from 'react-router-dom';
 
 import { fetchProductByIdAsync } from '../../redux/actions/productAction';
+import { addToBasketAsync } from '../../redux/actions/basketAction';
+import { toast } from 'react-toastify';
+
 
 const ProductContent = (props) => {
   const product = useSelector(state => state.productByIdReducer.product)
@@ -56,14 +59,30 @@ const ProductContent = (props) => {
 
 
   useEffect(() => {
-   setbasketCount(1);
-  }, [activeColorIndex,activeSizeIndex]);
+    setbasketCount(1);
+  }, [activeColorIndex, activeSizeIndex]);
   function decrementBasketCount() {
     if (basketCount !== 1) setbasketCount(basketCount - 1);
   }
 
   function incrementBasketCount() {
     setbasketCount(basketCount + 1);
+  }
+
+  function addToCart() {
+    const variants = [{name:"",color:""},{name:"",color:""}];
+    variants[0].name = "color";
+    variants[0].value = colorVariants[activeColorIndex]?.name;
+    variants[1].name = "size";
+    variants[1].value = sizeVariants[activeSizeIndex]?.name;
+    const price = sizeVariants[activeSizeIndex]?.price;
+    const photo = colorVariants[activeColorIndex]?.images[0].url;
+    const name = product.name;
+    const productId = id;
+    const quantity = basketCount;
+    dispatch(addToBasketAsync({ productId, quantity, variants, price, photo, name }));
+    toast.success('Məhsul səbətə əlavə edildi');
+
   }
 
   if (!product) return <div>Product Not Found</div>
@@ -203,7 +222,7 @@ const ProductContent = (props) => {
                   <del>3012 ₼</del>
                   <span>2089 ₼</span>
                 </div>
-                <div className={styles.addBasketBtn}>
+                <div className={styles.addBasketBtn} onClick={addToCart}>
                   <svg
                     width="21"
                     height="20"

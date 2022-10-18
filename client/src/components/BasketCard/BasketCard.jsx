@@ -1,37 +1,56 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import styles from "./basketCard.module.scss";
 import axios from '../../api/index';
+import { useDispatch } from 'react-redux';
+import { removeFromBasketAsync, updateBasketAsync } from '../../redux/actions/basketAction';
 
 
 
-const BasketCard = ({ basketProduct,setBasket }) => {
-  const { quantity, variants, price,_id, photo, name } = basketProduct;
+const BasketCard = ({ basketProduct }) => {
+  const { quantity, variants, price, _id, photo, name } = basketProduct;
   const [mark, setMark] = useState(true);
-
+  const [firstRender, setFirstRender] = useState(true);
   const [productCount, setProductCount] = useState(quantity);
   const [productVariants, setProductVariants] = useState({});
+  const dispatch = useDispatch();
 
-  async function removeProductFromBasket(){
-    const response = await axios.delete(`/basket/${_id}`);
-    setBasket(response.data.data.basket)
+  async function removeProductFromBasket() {
+    dispatch(removeFromBasketAsync(_id));
   }
 
-useEffect(() => {
-  const variantObj={};
-  variants.forEach(el => {
-    let name = el.name;
-    let value = el.value;
-    variantObj[name]= value;
-  })
-  setProductVariants(variantObj);
-}, []);
+  async function changeQuantity() {
+    if (productCount === 0) dispatch(removeFromBasketAsync(_id));
+    else {
+      dispatch(updateBasketAsync({ _id, productCount }));
+    }
+  }
+
+
+  useEffect(() => {
+    const variantObj = {};
+    variants.forEach(el => {
+      let name = el.name;
+      let value = el.value;
+      variantObj[name] = value;
+    })
+    setProductVariants(variantObj);
+  }, []);
+
+  useEffect(() => {
+    if (firstRender) {
+      setFirstRender(false);
+      return;
+    };
+    changeQuantity();
+  }, [productCount]);
 
   const increase = () => {
     setProductCount(productCount + 1);
+
   };
   const decrease = () => {
-    setProductCount(productCount - 1 >= 0 ? productCount - 1 : productCount);
+    setProductCount(productCount >= 1 ? productCount - 1 : productCount);
   };
 
   return (
@@ -105,7 +124,7 @@ useEffect(() => {
         </span>
       </div>
       <svg
-      onClick={removeProductFromBasket}
+        onClick={removeProductFromBasket}
         className={styles.deleteProduct}
         width="18"
         height="20"

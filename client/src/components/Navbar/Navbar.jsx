@@ -10,40 +10,66 @@ import SubCategories from "../SubCategories/SubCategories";
 
 
 const Navbar = ({ hamMenu }) => {
-  const [categories, setCategories] = useState([]);
-  const [selectedNav, setselectedNav] = useState("");
+  const [menuCategories, setMenuCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [selectedNav, setselectedNav] = useState(false);
+  const [children, setChildren] = useState([]);
 
 
   const getCategories = async () => {
     const response = await axios.get('/categories');
-    setCategories(response.data.data.categories.filter(category => category?.parentId?.length === 0));
+    setMenuCategories(response.data.data.categories.filter(category => category?.parentId?.length === 0));
+    setSubCategories(response.data.data.categories.filter(category => category?.parentId?.length !== 0));
   };
+
+  useEffect(() => {
+    function editArray(arr, parent) {
+      var newArray = []
+      for (var i in arr) {
+        if (arr[i]?.parentId?.includes(parent)) {
+          var children = editArray(arr, arr[i]._id)
+          // delete arr[i].id
+          // delete arr[i].parentId
+          arr[i].children = []
+          if (children.length) {
+            arr[i].children = children
+          }
+          newArray.push(arr[i])
+        }
+      }
+      return newArray
+    }
+
+
+    menuCategories.forEach(el => {
+      let res = editArray(subCategories, el._id);
+      el["children"] = res;
+    })
+  }, [menuCategories, subCategories]);
 
   useEffect(() => {
     getCategories();
   }, []);
 
-
+function mouseEnter(children){
+  setselectedNav(true);
+  setChildren(children)
+}
   return (
     <div className={styles.navbar} onMouseLeave={() => setselectedNav("")}>
       <div className="container">
         <div className={styles.navigations}>
-          {categories.map((category, index) => {
-            return  <NavLink className={({ isActive }) => (isActive ? styles.active : 'inactive')}
-            key={index} to={`/products/${category.slug}/1`}>{category.name.charAt(0).toUpperCase() + category.name.slice(1)}</NavLink>
-           
+          {menuCategories.map((category, index) => {
+            return <NavLink onMouseEnter={()=>mouseEnter(category.children)} onMouseLeave={() => setselectedNav(false)}  className={({ isActive }) => (isActive ? styles.active : 'inactive')}
+              key={index} to={`/products/${category.slug}/1`}>{category.name.charAt(0).toUpperCase() + category.name.slice(1)}</NavLink>
+
           })}
 
-          {/* //  <div className="navigator"
-            //   onMouseEnter={() => setselectedNav("")}
-            //   onClick={() => setselectedNav("apple")}>
-            //   {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
-            // </div> */}
 
         </div>
       </div>
 
-      {selectedNav != "" && <SubCategories></SubCategories>}
+    <SubCategories categoryChildren={children}></SubCategories>
     </div>
   );
 };
