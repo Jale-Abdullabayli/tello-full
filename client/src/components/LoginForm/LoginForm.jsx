@@ -1,8 +1,10 @@
-import React,{useState} from "react";
+import React, { useState, useEffect } from "react";
 import { BsGoogle } from "react-icons/bs";
 import { FaFacebookF } from "react-icons/fa";
 import authImg from "../../assets/icons/authImg.svg";
 import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom'
+
 import {
   Container,
   Wrapper,
@@ -23,37 +25,54 @@ const formInit = {
 }
 
 const LoginForm = () => {
-
+  let navigate = useNavigate();
 
   const [formData, setFormData] = useState(formInit);
 
-  const { error } = useSelector(state => state.authReducer)
+  const error = useSelector(state => state.authReducer);
   const dispatch = useDispatch()
+  // console.log(error);
+
+
 
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
+
   const login = async (e) => {
     e.preventDefault();
     try {
       const response = await dispatch(signin(formData));
+      // console.log(error)
+      // console.log(response);
+
       if (!response?.error) {
-        toast.success('Logined successfully')
+        toast.success('Logined successfully');
+        navigate("/profile/order-list", { replace: true });
       }
       else {
-        toast.error(error)
+        // console.log(response.payload.message)
+        toast.error(response.payload.message);
       }
+      return response;
     } catch (err) {
 
     }
   }
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
+  useEffect(() => {
+    console.log(error);
+  }, [error]);
   return (
     <Container>
 
       <Wrapper>
         <FormContainer>
           <h2>Daxil ol</h2>
+
           <Icons>
             <div className="icon">
               <span>
@@ -74,7 +93,7 @@ const LoginForm = () => {
             <div>
               <label>E-mail</label>
               <input
-               onChange={onChangeHandler}
+                onChange={onChangeHandler}
                 type="email"
                 name="email"
                 id="email"
@@ -84,7 +103,7 @@ const LoginForm = () => {
             <div>
               <label>Şifrə</label>
               <input
-               onChange={onChangeHandler}
+                onChange={onChangeHandler}
                 type="password"
                 name="password"
                 id="password"

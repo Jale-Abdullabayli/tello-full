@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 
 import styles from "./basketCard.module.scss";
-import axios from '../../api/index';
 import { useDispatch } from 'react-redux';
 import { removeFromBasketAsync, updateBasketAsync } from '../../redux/actions/basketAction';
-
+import {Link} from 'react-router-dom';
 
 
 const BasketCard = ({ basketProduct }) => {
@@ -59,9 +58,9 @@ const BasketCard = ({ basketProduct }) => {
         className={`${styles.checkMark} ${mark && styles.marked}`}
         onClick={() => setMark(!mark)}
       ></div>
-      <div className={styles.productImg}>
+      <Link className={styles.productImg} to={`/productContent/${_id}`}>
         <img src={photo} alt="" />
-      </div>
+        </Link>
       <div className={styles.productContent}>
         <h3 className={styles.productName}>
           {name} {productVariants.size} {productVariants.color}

@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import authImg from "../../assets/icons/authImg.svg";
 import { BsGoogle } from "react-icons/bs";
 import { FaFacebookF } from "react-icons/fa";
 import { signup } from "../../redux/actions/authAction";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 import {
   Container,
@@ -17,6 +16,8 @@ import {
 import { Link } from "react-router-dom";
 import Toastify from "../Toastify/Toastify";
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom'
+
 
 const formInit = {
   name: "",
@@ -26,25 +27,33 @@ const formInit = {
 }
 
 const Register = () => {
+
   const [formData, setFormData] = useState(formInit);
 
   const { error } = useSelector(state => state.authReducer)
   const dispatch = useDispatch()
-  const navigate = useNavigate();
 
   const onChangeHandler = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
+  let navigate = useNavigate();
 
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const register = async (e) => {
     e.preventDefault();
     try {
       const response = await dispatch(signup(formData));
       if (!response?.error) {
-        toast.success('Registered successfully')
+        toast.success('Registered successfully');
+        navigate("/profile/order-list", { replace: true });
+
       }
       else {
-        toast.error(error)
+               toast.error(response.payload.message);
+
       }
     } catch (err) {
 
@@ -73,7 +82,7 @@ const Register = () => {
             </div>
           </Icons>
           <p>və ya</p>
-         
+
           <FormStyled onSubmit={register}>
             <div>
               <label>Ad</label>

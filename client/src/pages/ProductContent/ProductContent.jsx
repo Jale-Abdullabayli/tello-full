@@ -57,7 +57,9 @@ const ProductContent = (props) => {
 
   }, [colorVariants, activeColorIndex]);
 
-
+useEffect(() => {
+ console.log(activeSliderImages);
+}, [activeSliderImages]);
   useEffect(() => {
     setbasketCount(1);
   }, [activeColorIndex, activeSizeIndex]);
@@ -141,9 +143,10 @@ const ProductContent = (props) => {
                     })
                   }
                 </div>
-                <p className={styles.ratesCount}>({product?.ratingsQuantity})</p>
+                {product?.reviews?.length!==0 && <><p className={styles.ratesCount}>({product?.ratingsQuantity})</p>
                 <span className={styles.lineY}></span>
-                <p className={styles.commentCount}>{product?.reviews?.length} rəy</p>
+                <p className={styles.commentCount}>{product?.reviews?.length} rəy</p></>}
+                
               </div>
               <div className={styles.productPrice}>
                 {/* <del>{product.price} ₼</del> */}

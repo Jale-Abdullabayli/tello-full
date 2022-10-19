@@ -1,5 +1,9 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import Profile from '../../pages/Profile/Profile';
+import OrderList from '../../pages/Profile/Orders/OrderList/OrderList';
+import OrderDetail from '../../pages/Profile/Orders/OrderDetail/OrderDetail';
+import UserInfo from '../../pages/Profile/UserInfo/UserInfo';
 
 // Connections
 import {
@@ -16,6 +20,11 @@ const Main = () => {
     <div className="main">
       <Routes>
         <Route path="" element={<Home />} exact></Route>
+        <Route path="/profile" element={<Profile />} >
+          <Route path="order-detail" element={<OrderDetail />} />
+          <Route path="order-list" element={<OrderList />} />
+          <Route path="user-info" element={<UserInfo />} />
+        </Route>
         <Route path="/products/:categoryName/:page" element={<ProductsPage />} />
         <Route path="productContent/:id" element={<ProductContent />}></Route>
         <Route path="asketQuestions" element={<AsketQuestions />}></Route>

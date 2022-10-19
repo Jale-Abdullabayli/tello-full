@@ -64,8 +64,9 @@ exports.createProduct = asyncCatch(async (req, res) => {
   for (let i = 0; i < req.files.length; i++) {
     let fieldname = req.files[i].fieldname;
     if (fieldname != "imageCover") {
+
       arrayOfFieldname = fieldname.split('-');
-      const data = await cloudinary.uploader.upload(req.files[i].path, { public_id: `tello/productImages/${req.body.name}-${arrayOfFieldname[0]}-${arrayOfFieldname[1]}` });
+      const data = await cloudinary.uploader.upload(req.files[i].path, { public_id: `tello/productImages/${req.body.name}-${arrayOfFieldname[0]}-${arrayOfFieldname[1]}-${arrayOfFieldname[2]}` });
       let imageObj = { url: "", urlId: "" };
       imageObj.url = data.secure_url;
       imageObj.urlId = data.public_id

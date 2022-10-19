@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { signup,signin } from '../actions/authAction';
+import { signup, signin,updateUserAsync } from '../actions/authAction';
 
 const user = JSON.parse(localStorage.getItem("auth"));
 
@@ -14,6 +14,17 @@ const initialState = {
 export const authReducer = createSlice({
     name: 'auth',
     initialState,
+    reducers: {
+        logOutSync: (state) => {
+            console.log('hjk')
+            localStorage.removeItem("auth");
+            state.loading = false;
+            state.auth = false;
+            state.profile = null;
+            state.token = "";
+            state.error = null;
+        }
+    },
     extraReducers: {
         [signup.pending]: (state) => {
             state.loading = true;
@@ -40,8 +51,22 @@ export const authReducer = createSlice({
             state.auth = true;
             state.token = payload.data.token;
             state.profile = payload.data.user;
+        },
+         [updateUserAsync.pending]: (state) => {
+            state.loading = true;
+        },
+        [updateUserAsync.rejected]: (state, { payload }) => {
+            state.loading = false;
+            state.error = payload.message;
+        },
+        [updateUserAsync.fulfilled]: (state, { payload }) => {
+            state.loading = false;
+            state.auth = true;
+            state.token = payload.data.token;
+            state.profile = payload.data.user;
         }
     }
 })
 
+export const { logOutSync } = authReducer.actions
 export default authReducer.reducer;

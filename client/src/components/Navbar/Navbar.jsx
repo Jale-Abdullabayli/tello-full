@@ -18,8 +18,8 @@ const Navbar = ({ hamMenu }) => {
 
   const getCategories = async () => {
     const response = await axios.get('/categories');
-    setMenuCategories(response.data.data.categories.filter(category => category?.parentId?.length === 0));
-    setSubCategories(response.data.data.categories.filter(category => category?.parentId?.length !== 0));
+    setMenuCategories(response?.data?.data?.categories.filter(category => category?.parentId?.length === 0));
+    setSubCategories(response?.data?.data?.categories.filter(category => category?.parentId?.length !== 0));
   };
 
   useEffect(() => {
@@ -51,16 +51,16 @@ const Navbar = ({ hamMenu }) => {
     getCategories();
   }, []);
 
-function mouseEnter(children){
-  setselectedNav(true);
-  setChildren(children)
-}
+  function mouseEnter(children) {
+    setselectedNav(true);
+    setChildren(children)
+  }
   return (
-    <div className={styles.navbar} onMouseLeave={() => setselectedNav("")}>
+    <div className={styles.navbar} >
       <div className="container">
         <div className={styles.navigations}>
           {menuCategories.map((category, index) => {
-            return <NavLink onMouseEnter={()=>mouseEnter(category.children)} onMouseLeave={() => setselectedNav(false)}  className={({ isActive }) => (isActive ? styles.active : 'inactive')}
+            return <NavLink onMouseEnter={() => mouseEnter(category.children)} onMouseLeave={() => setselectedNav(false)} className={({ isActive }) => (isActive ? styles.active : 'inactive')}
               key={index} to={`/products/${category.slug}/1`}>{category.name.charAt(0).toUpperCase() + category.name.slice(1)}</NavLink>
 
           })}
@@ -68,8 +68,12 @@ function mouseEnter(children){
 
         </div>
       </div>
+      {selectedNav && children.length!==0 && <div onMouseEnter={()=>setselectedNav(true)}  onMouseLeave={() => setselectedNav(false)} className={styles.subCategories}>
+        <div className="container">
+          <SubCategories  categoryChildren={children}></SubCategories>
+        </div>
+      </div>}
 
-    <SubCategories categoryChildren={children}></SubCategories>
     </div>
   );
 };

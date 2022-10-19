@@ -6,7 +6,8 @@ exports.changeUserData = asyncCatch(async (req, res) => {
   const user = await User.findByIdAndUpdate(req.user._id, {
     name: req.body.name,
     email: req.body.email,
-  });
+    surname: req.body.surname,
+  },{new: true});
 
-  res.status(200).json({ success: true, user });
+  res.status(200).json({ success: true, data: { user } });
 });

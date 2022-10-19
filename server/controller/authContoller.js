@@ -4,6 +4,8 @@ const User = require("../model/user");
 const jwt = require("jsonwebtoken");
 const GlobalError = require("../error/GlobalError");
 const sendEmail = require("../utils/email");
+const Email = require("../utils/email");
+
 
 function signJWT(id) {
   const token = jwt.sign({ id: id }, process.env.JWT_SIGNATURE, {
@@ -22,6 +24,11 @@ exports.signup = asyncCatch(async (req, res) => {
     passwordConfirm: req.body.passwordConfirm
   });
 
+  const url = 'http://localhost:3000/';
+
+  const emailHandler = new Email(user, url);
+  await emailHandler.sendWelcome();
+
   const token = signJWT(user._id);
 
   res.json({ success: true, data: { user, token } });
@@ -33,18 +40,17 @@ exports.login = asyncCatch(async (req, res, next) => {
   if (!email || !password)
     return next(new GlobalError("Please provide email and password"));
 
-  const user = await User.findOne({ email }).select("+password"); 
+  const user = await User.findOne({ email }).select("+password");
 
   if (!user || !(await user.checkPassword(password, user.password)))
     return next(new GlobalError("Email or password incorrect"));
 
   const token = signJWT(user._id);
 
-  res.json({ success: true, data: {user, token } });
+  res.json({ success: true, data: { user, token } });
 });
 
 
-// forget password
 exports.forgetPassword = asyncCatch(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
@@ -54,15 +60,11 @@ exports.forgetPassword = asyncCatch(async (req, res, next) => {
   const passwordToken = await user.generatePassToken();
   await user.save({ validateBeforeSave: false });
 
-  const path = `Please follow the link to change password: ${
-    req.protocol
-  }://${req.get("host")}/api/v1/resetPassword/${passwordToken}`;
+  const path = `${req.protocol}://${req.get("host")}/api/v1/${passwordToken}`;
 
-  await sendEmail({
-    email: user.email,
-    subject: "Change password!",
-    message: path,
-  });
+  const emailHandler = new Email(user, path);
+  await emailHandler.sendResetPassword();
+
 
   res.json({
     message: "Email sent",
@@ -85,7 +87,7 @@ exports.resetPassword = asyncCatch(async (req, res, next) => {
 
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
-  user.resetExpires = undefined;  
+  user.resetExpires = undefined;
   user.forgetPassword = undefined;
   await user.save();
 

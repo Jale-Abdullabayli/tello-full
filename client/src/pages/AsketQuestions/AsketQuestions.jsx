@@ -19,8 +19,6 @@ const getFAQ= async()=>{
     
   }, []);
 
-  console.log(FAQ)
-
 
   return (
     <div className={styles.questionPage}>
@@ -28,10 +26,10 @@ const getFAQ= async()=>{
         <h3>Tez-tez verilən suallar</h3>
         {FAQ.map((el) => {
          return <div
-            className={`${styles.question} ${openAnswer == el.id && styles.active
+            className={`${styles.question} ${openAnswer == el._id && styles.active
               }`}
             onClick={(e) => {
-              setOpenAnswer(openAnswer == el.id ? "" : el.id);
+              setOpenAnswer(openAnswer == el._id ? "" : el._id);
             }}
           >
             <div className={styles.questionHeader}>
@@ -39,8 +37,8 @@ const getFAQ= async()=>{
                 {el.title}
               </h5>
               <svg
-                className={openAnswer == el.id && styles.active}
-                width="24"
+                className={openAnswer == el._id && styles.active}
+                w_idth="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"

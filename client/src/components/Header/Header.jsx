@@ -17,6 +17,8 @@ const Header = ({ setHamMenu }) => {
 
   const dispatch = useDispatch();
 
+  const authReducer = useSelector(state => state.authReducer)
+
   const basket = useSelector(state => {
     return state.basketReducer.basket;
   });
@@ -47,12 +49,12 @@ const Header = ({ setHamMenu }) => {
     }, 500);
   };
 
- 
+
 
   useEffect(() => {
     dispatch(getBasketAsync());
     window.scrollTo(0, 0);
-   
+
     function handleClickOutside(event) {
 
       if (!resultRef.current?.contains(event.target)) {
@@ -131,9 +133,14 @@ const Header = ({ setHamMenu }) => {
         </div>
         <div className={styles.listGroup}>
           {/* Login / Register */}
-          <Link to="/login">
+          {!authReducer.auth ? <Link to="/login">
             <User />
-          </Link>
+          </Link> :
+          <Link to="/profile/order-list">
+           <span> {authReducer?.profile?.name}</span>
+          <User />
+        </Link>}
+          
           {/* Fav */}
           <Favorite />
           <Link to='basket'>
