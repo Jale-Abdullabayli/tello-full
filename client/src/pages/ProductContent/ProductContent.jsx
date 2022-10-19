@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 
 
 const ProductContent = (props) => {
+  const userInfo=useSelector(state => state.authReducer.profile);
   const product = useSelector(state => state.productByIdReducer.product)
   const dispatch = useDispatch();
   const [activeColorIndex, setActiveColorIndex] = useState(0);
@@ -26,12 +27,11 @@ const ProductContent = (props) => {
   let [basketCount, setbasketCount] = useState(1);
 
   let { id } = useParams();
-
   useEffect(() => {
     window.scrollTo(0, 0);
     dispatch(fetchProductByIdAsync(id));
 
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     product?.variants?.forEach(el => {
@@ -57,9 +57,8 @@ const ProductContent = (props) => {
 
   }, [colorVariants, activeColorIndex]);
 
-useEffect(() => {
- console.log(activeSliderImages);
-}, [activeSliderImages]);
+  useEffect(() => {
+  }, [activeSliderImages]);
   useEffect(() => {
     setbasketCount(1);
   }, [activeColorIndex, activeSizeIndex]);
@@ -72,12 +71,12 @@ useEffect(() => {
   }
 
   function addToCart() {
-    const variants = [{name:"",color:""},{name:"",color:""}];
+    const variants = [{ name: "", value: "" }, { name: "", value: "" }];
     variants[0].name = "color";
     variants[0].value = colorVariants[activeColorIndex]?.name;
     variants[1].name = "size";
     variants[1].value = sizeVariants[activeSizeIndex]?.name;
-    const price = sizeVariants[activeSizeIndex]?.price;
+    const price = sizeVariants.length !== 0 ? sizeVariants[activeSizeIndex]?.price : product.price;
     const photo = colorVariants[activeColorIndex]?.images[0].url;
     const name = product.name;
     const productId = id;
@@ -98,7 +97,7 @@ useEffect(() => {
             </div>
             <div className={styles.productContent}>
               <h2>
-                {`${product.name} ${sizeVariants[activeSizeIndex]?.name} ${colorVariants[activeColorIndex]?.name}`}
+                {`${product.name} ${sizeVariants.length !== 0 ? ", "+sizeVariants[activeSizeIndex]?.name : ""} , ${colorVariants[activeColorIndex]?.name}`}
               </h2>
               <div className={styles.productRatings}>
                 <div className={styles.stars}>
@@ -143,14 +142,14 @@ useEffect(() => {
                     })
                   }
                 </div>
-                {product?.reviews?.length!==0 && <><p className={styles.ratesCount}>({product?.ratingsQuantity})</p>
-                <span className={styles.lineY}></span>
-                <p className={styles.commentCount}>{product?.reviews?.length} rəy</p></>}
-                
+                {product?.reviews?.length !== 0 && <><p className={styles.ratesCount}>({product?.ratingsQuantity})</p>
+                  <span className={styles.lineY}></span>
+                  <p className={styles.commentCount}>{product?.reviews?.length} rəy</p></>}
+
               </div>
               <div className={styles.productPrice}>
                 {/* <del>{product.price} ₼</del> */}
-                <span>{sizeVariants[activeSizeIndex]?.price} ₼</span>
+                <span>{sizeVariants.length !== 0 ? sizeVariants[activeSizeIndex]?.price : product.price} ₼</span>
               </div>
               <span className={styles.lineX}></span>
 
@@ -167,7 +166,7 @@ useEffect(() => {
                   })}
                 </div>
               </div>
-              <div className={styles.productCapacities}>
+              {sizeVariants.length !== 0 && <div className={styles.productCapacities}>
                 <h5>Yaddaş:</h5>
 
                 {sizeVariants?.map((size, index) => <span key={index} onClick={() => setActiveSizeIndex(index)}
@@ -175,6 +174,7 @@ useEffect(() => {
                 >{size.name}</span>)}
 
               </div>
+              }
               <span className={styles.lineX}></span>
               <div className={styles.productCount}>
                 <span onClick={decrementBasketCount}>
@@ -801,11 +801,12 @@ useEffect(() => {
             <form action="">
               <div className={styles.inputBox}>
                 <label htmlFor="name">Ad</label>
-                <input type="text" id="name" placeholder="Adınızı daxil edin" />
+                <input value={userInfo && userInfo.name} type="text" id="name" placeholder="Adınızı daxil edin" />
               </div>
               <div className={styles.inputBox}>
                 <label htmlFor="surname">Soyad</label>
                 <input
+                value={userInfo && userInfo.surname}
                   type="text"
                   id="surname"
                   placeholder="Soyadınızı daxil edin"

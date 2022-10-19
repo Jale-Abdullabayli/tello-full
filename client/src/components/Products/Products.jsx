@@ -39,7 +39,7 @@ const Products = () => {
 
   useEffect(() => {
     getProductsByCategory();
-  }, [category]);
+  }, [category,sortText]);
 
 
   useEffect(() => {

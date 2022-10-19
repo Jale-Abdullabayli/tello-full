@@ -1,19 +1,20 @@
 import React, { useEffect } from 'react';
 import './OrderList.scss';
 import { useDispatch, useSelector } from 'react-redux';
-// import { getTopSellingsAsync } from '../../../../redux/actions/product';
 import OrderInfo from '../OrderInfo/OrderInfo';
 // import MoonLoader from "react-spinners/MoonLoader";
+import { fetchProductsAsync } from '../../../../redux/actions/productAction';
 
 
 function OrderList() {
 
     const dispatch = useDispatch();
-    // const topSellings = useSelector(state => state.topSellings);
+    const products = useSelector(state => state.productReducer.products.slice(0, 4));
+console.log(products);
 
 const topSellings={};
     useEffect(() => {
-        // dispatch(getTopSellingsAsync());
+        dispatch(fetchProductsAsync());
         window.scrollTo(0, 0)
     }, []);
     return (
@@ -27,7 +28,7 @@ const topSellings={};
                     <h4>Sifarişlərim (4 məhsul)</h4>
                     <div className="row">
                         {
-                            topSellings?.products?.map(product => <OrderInfo product={product} key={product.id} />)
+                            products?.map(product => <OrderInfo product={product} key={product._id} />)
                         }
                     </div>
                 </div>

@@ -10,7 +10,7 @@ function OrderInfo({ product }) {
             <div className='orderInfo'>
                 <div className="row">
                     <div className="col-md-5">
-                        <img className='productImg' src={product.image.url} alt="productImg" />
+                        <img className='productImg' src={product.imageCover} alt="productImg" />
                     </div>
                     <div className="col-md-7">
                         <div className="properties">
@@ -24,7 +24,7 @@ function OrderInfo({ product }) {
                             </div>
                             <div className="property">
                                 <span>Ümumi məbləğ:</span>
-                                <div className="price">{product.price.formatted} <img src={aznSymbol} alt="azn" /></div>
+                                <div className="price">{product.price} <img src={aznSymbol} alt="azn" /></div>
                             </div>
                         </div>
                         <Link to='/profile/order-detail' className='detail'>Sifarişin detalları</Link>

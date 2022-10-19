@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import './OrderDetail.scss';
 import { useDispatch, useSelector } from 'react-redux';
-// import { getProductByIdAsync } from '../../../../redux/actions/product';
+import { fetchProductByIdAsync } from '../../../../redux/actions/productAction';
+
 import backIcon from '../../../../assets/images/backIcon.svg';
 import { Link } from 'react-router-dom';
 import cardIcon from '../../../../assets/images/cardIcon.svg';
@@ -12,20 +13,19 @@ import aznSymbol from '../../../../assets/images/aznSymbol.svg';
 function OrderDetail() {
 
     const dispatch = useDispatch();
-    // let orderDetail = useSelector(state => {
-    //     return state.productById;
-    // });
-
-    let orderDetail ={};
+    let orderDetail = useSelector(state => {
+        return state.productByIdReducer.product;
+    });
+console.log(orderDetail)
     useEffect(() => {
-        // dispatch(getProductByIdAsync('prod_kpnNwA1v2XwmXB'));
+        dispatch(fetchProductByIdAsync('6350374ae5bc084e06871ea6'));
         window.scrollTo(0, 0);
     }, []);
     return (
 
         <>
         {
-             orderDetail.loading ?
+             false?
              <div className="spinner">
                  {/* <MoonLoader color={'#2DD06E'} loading={orderDetail.loading} size={100} /> */}
              </div> :
@@ -36,7 +36,7 @@ function OrderDetail() {
              </Link>
              <div className="orderDetailMain">
                  <div className="productDetail">
-                     <img src={orderDetail?.product?.image?.url} alt="productImg" />
+                     <img src={orderDetail?.imageCover} alt="productImg" />
                      <div className="productInfo">
                          <h3 className="name">iPhone 12, 64 GB, Bənövşəyi, (MJNM3) Golden  5 G 8690604083886 0212042</h3>
                          <div className="row">

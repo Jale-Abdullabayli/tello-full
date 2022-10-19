@@ -7,7 +7,7 @@ import {Link} from 'react-router-dom';
 
 
 const BasketCard = ({ basketProduct }) => {
-  const { quantity, variants, price, _id, photo, name } = basketProduct;
+  const { quantity, variants, price, _id, photo, name,productId } = basketProduct;
   const [mark, setMark] = useState(true);
   const [firstRender, setFirstRender] = useState(true);
   const [productCount, setProductCount] = useState(quantity);
@@ -58,7 +58,7 @@ const BasketCard = ({ basketProduct }) => {
         className={`${styles.checkMark} ${mark && styles.marked}`}
         onClick={() => setMark(!mark)}
       ></div>
-      <Link className={styles.productImg} to={`/productContent/${_id}`}>
+      <Link className={styles.productImg} to={`/productContent/${productId}`}>
         <img src={photo} alt="" />
         </Link>
       <div className={styles.productContent}>
