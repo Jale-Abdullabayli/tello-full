@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import * as api from '../../api/review';
+import moment from 'moment'
 
 import styles from "./productContent.module.scss";
 import { useSelector, useDispatch } from "react-redux";
@@ -12,42 +14,63 @@ import { addToBasketAsync } from '../../redux/actions/basketAction';
 import { toast } from 'react-toastify';
 
 
+
 const ProductContent = (props) => {
-  const userInfo=useSelector(state => state.authReducer.profile);
-  const product = useSelector(state => state.productByIdReducer.product)
+  const userInfo = useSelector(state => state.authReducer.profile);
+  const productById = useSelector(state => state.productByIdReducer.product);
+  const [product, setProduct] = useState({});
   const dispatch = useDispatch();
   const [activeColorIndex, setActiveColorIndex] = useState(0);
+  const [technicalBtn, setTechnicalBtn] = useState(true);
   const [activeSizeIndex, setActiveSizeIndex] = useState(0);
   const [colorVariants, setColorVariants] = useState([]);
   const [sizeVariants, setSizeVariants] = useState([]);
   const [activeSliderImages, setActiveSliderImages] = useState([]);
-  const [technicalBtn, setTechnicalBtn] = useState(true);
-  const [rating, setRating] = useState([]);
-  const [emptyRatingStars, setEmptyRatingStars] = useState([]);
+  const [fullRatingStars, setFullRatingStars] = useState(0);
+  const [rating, setRating] = useState(5);
+  const [variantOptions, setVariantOptions] = useState([]);
+  const [reviewData, setReviewData] = useState({});
   let [basketCount, setbasketCount] = useState(1);
 
   let { id } = useParams();
   useEffect(() => {
     window.scrollTo(0, 0);
     dispatch(fetchProductByIdAsync(id));
-
   }, [id]);
 
   useEffect(() => {
+    setProduct(productById);
+  }, [productById]);
+
+  useEffect(() => {
+    if(product?.variants?.length===1) setSizeVariants([]);
     product?.variants?.forEach(el => {
       if (el.variantName === "color") setColorVariants(el.values);
       else if (el.variantName === "size") setSizeVariants(el.values);
     })
-    setRating([]);
-    setEmptyRatingStars([])
-    for (let i = 0; i < Math.round(product?.ratingsAverage); i++) {
-      setRating(rating => [...rating, 1])
-    }
-
-    for (let i = 0; i < 5 - Math.round(product?.ratingsAverage); i++) {
-      setEmptyRatingStars(rating => [...rating, 1])
-    }
+    setFullRatingStars(Math.round(product?.ratingsAverage));
   }, [product]);
+
+
+  useEffect(() => {
+
+    const variantArr = [];
+    if (sizeVariants.length !== 0) {
+      for (let i = 0; i < colorVariants.length; i++) {
+        for (let j = 0; j < sizeVariants.length; j++) {
+          variantArr.push({ color: colorVariants[i].name, size: sizeVariants[j].name })
+
+        }
+      }
+    }
+    else {
+      for (let i = 0; i < colorVariants.length; i++) {
+        variantArr.push({ color: colorVariants[i].name })
+      }
+    }
+    setVariantOptions(variantArr);
+  }, [colorVariants, sizeVariants]);
+
 
 
   useEffect(() => {
@@ -69,6 +92,45 @@ const ProductContent = (props) => {
   function incrementBasketCount() {
     setbasketCount(basketCount + 1);
   }
+
+  function rateProduct(index) {
+    setRating(index + 1);
+    setReviewData({ ...reviewData, rating: index + 1 })
+  }
+
+  useEffect(() => {
+    setReviewData({ ...reviewData, name: userInfo?.name, rating: 5, surname: userInfo?.surname, color: variantOptions[0]?.color, size: variantOptions[0]?.size })
+  }, [userInfo, variantOptions]);
+
+
+  function changeForm(e) {
+    if (e.target.name === "") return;
+    if (e.target.name === "variant") {
+      setReviewData({ ...reviewData, ...variantOptions[Number(e.target.value)] });
+    }
+    else {
+      let newObj = {};
+      let inputName = e.target.name;
+      let inputValue = e.target.value;
+      newObj[inputName] = inputValue;
+      setReviewData({ ...reviewData, ...newObj });
+    }
+
+  }
+  async function addReview(e) {
+    e.preventDefault();
+
+    const { data } = await api.addReview(reviewData, id);
+
+    if (data.success) {
+      setProduct({ ...product, reviews: [...product.reviews, data.review] })
+
+      toast.success('Rəy bildirildi. Təşəkkür edirik!');
+    }
+
+
+  }
+
 
   function addToCart() {
     const variants = [{ name: "", value: "" }, { name: "", value: "" }];
@@ -97,52 +159,35 @@ const ProductContent = (props) => {
             </div>
             <div className={styles.productContent}>
               <h2>
-                {`${product.name} ${sizeVariants.length !== 0 ? ", "+sizeVariants[activeSizeIndex]?.name : ""} , ${colorVariants[activeColorIndex]?.name}`}
+                {`${product.name}${sizeVariants.length !== 0 ? ", " + sizeVariants[activeSizeIndex]?.name : ""}, ${colorVariants[activeColorIndex]?.name}`}
               </h2>
               <div className={styles.productRatings}>
                 <div className={styles.stars}>
+
+
                   {
-                    rating.map(el => {
+                    fullRatingStars ? [...Array(5)].map((el, index) => {
+                      let fillColor = index < fullRatingStars ? "#F2994A" : "#FFFFFF"
                       return <span className={styles.star}>
-                        <svg
-                          width="18"
-                          height="18"
+                        <svg onClick={() => rateProduct(index)}
+                          width="30"
+                          height="30"
                           viewBox="0 0 18 18"
                           fill="none"
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
                             d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                            fill="#F2994A"
+                            fill={fillColor}
                             stroke="#F2994A"
                           />
                         </svg>
                       </span>
-                    })
-                  }
-                  {
-                    emptyRatingStars.map(el => {
-                      return <span className={styles.star}>
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 18 18"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                            fill="white"
-                            stroke="#F2994A"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </span>
-                    })
+                    }) : ""
                   }
                 </div>
-                {product?.reviews?.length !== 0 && <><p className={styles.ratesCount}>({product?.ratingsQuantity})</p>
+                {product?.reviews?.length !== 0 && <>
+                  {/* <p className={styles.ratesCount}>({product?.ratingsQuantity})</p> */}
                   <span className={styles.lineY}></span>
                   <p className={styles.commentCount}>{product?.reviews?.length} rəy</p></>}
 
@@ -260,7 +305,7 @@ const ProductContent = (props) => {
               </div>
             </div>
           </div>
-          {/* <div className={styles.additionalInfo}>
+          <div className={styles.additionalInfo}>
             <div
               className={`${styles.generalInfo} ${!technicalBtn && styles.active
                 }`}
@@ -297,58 +342,9 @@ const ProductContent = (props) => {
               className={`${styles.technicalInfo} ${!technicalBtn && styles.active
                 }`}
             >
+
               <div className={styles.infoSection}>
                 <h3 className={styles.infoHeader}>Əsas göstəricilər</h3>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
-              </div>
-              <div className={styles.infoSection}>
-                <h3 className={styles.infoHeader}>Əsas göstəricilər</h3>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
-              </div>
-              <div className={styles.infoSection}>
-                <h3 className={styles.infoHeader}>Əsas göstəricilər</h3>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
-                <p>
-                  <span>İstehsalçı</span>
-                  <span>Apple</span>
-                </p>
                 <p>
                   <span>İstehsalçı</span>
                   <span>Apple</span>
@@ -359,463 +355,106 @@ const ProductContent = (props) => {
               className={`${styles.commentsSection} ${technicalBtn && styles.active
                 }`}
             >
-              <div className={styles.comment}>
-                <div className={styles.commentRate}>
-                  <h2>4</h2>
-                  <div className={styles.commentStars}>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
+{product?.reviews?.length===0 ? <h6>Bu məhsul üçün heç bir rəy yoxdur.</h6> : ""}
+              {product?.reviews?.map(review => {
+                return <div className={styles.comment}>
+                  <div className={styles.commentRate}>
+                    <h2>{review.rating}</h2>
+                    <div className={styles.commentStars}>
+
+                      {
+                        [...Array(5)].map((el, index) => {
+                          let fillColor = index < review.rating ? "#F2994A" : "#FFFFFF"
+                          return <span className={styles.star}>
+                            <svg onClick={() => rateProduct(index)}
+                              width="30"
+                              height="30"
+                              viewBox="0 0 18 18"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
+                                fill={fillColor}
+                                stroke="#F2994A"
+                              />
+                            </svg>
+                          </span>
+                        })
+                      }
+                    </div>
+                  </div>
+                  <div className={styles.commentContent}>
+                    <div className={styles.commentHeader}>
+                      <h3>{review.name} {review.surname}</h3>
+                      <span className={styles.commentDate}>{moment(review.createdAt).fromNow()}</span>
+                    </div>
+                    <span className={styles.productInfo}>
+                      {review.size ? `Yaddaş - ${review.size}, `:""}
+                       Rəng - {review.color}
                     </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="white"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
+                    <p>
+                      {review.description}
+                    </p>
                   </div>
                 </div>
-                <div className={styles.commentContent}>
-                  <div className={styles.commentHeader}>
-                    <h3>Gunel Mammadova</h3>
-                    <span className={styles.commentDate}>5 gün əvvəl</span>
-                  </div>
-                  <span className={styles.productInfo}>
-                    Yaddaş - 64, Rəng - Qara
-                  </span>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
-                    mattis viverra lacus ut et, etiam. Vel ut in nunc nunc ut sit
-                    nibh tortor sit. Consectetur sit auctor odio quis suspendisse
-                    tincidunt quis. Et tristique amet aenean nibh porttitor quis
-                    aliquam integer. Consectetur lacus, volutpat malesuada libero.
-                    Sollicitudin libero pharetra a.
-                  </p>
-                </div>
-              </div>
-              <div className={styles.comment}>
-                <div className={styles.commentRate}>
-                  <h2>4</h2>
-                  <div className={styles.commentStars}>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="white"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.commentContent}>
-                  <div className={styles.commentHeader}>
-                    <h3>Gunel Mammadova</h3>
-                    <span className={styles.commentDate}>5 gün əvvəl</span>
-                  </div>
-                  <span className={styles.productInfo}>
-                    Yaddaş - 64, Rəng - Qara
-                  </span>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
-                    mattis viverra lacus ut et, etiam. Vel ut in nunc nunc ut sit
-                    nibh tortor sit. Consectetur sit auctor odio quis suspendisse
-                    tincidunt quis. Et tristique amet aenean nibh porttitor quis
-                    aliquam integer. Consectetur lacus, volutpat malesuada libero.
-                    Sollicitudin libero pharetra a.
-                  </p>
-                </div>
-              </div>
-              <div className={styles.comment}>
-                <div className={styles.commentRate}>
-                  <h2>4</h2>
-                  <div className={styles.commentStars}>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="white"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.commentContent}>
-                  <div className={styles.commentHeader}>
-                    <h3>Gunel Mammadova</h3>
-                    <span className={styles.commentDate}>5 gün əvvəl</span>
-                  </div>
-                  <span className={styles.productInfo}>
-                    Yaddaş - 64, Rəng - Qara
-                  </span>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
-                    mattis viverra lacus ut et, etiam. Vel ut in nunc nunc ut sit
-                    nibh tortor sit. Consectetur sit auctor odio quis suspendisse
-                    tincidunt quis. Et tristique amet aenean nibh porttitor quis
-                    aliquam integer. Consectetur lacus, volutpat malesuada libero.
-                    Sollicitudin libero pharetra a.
-                  </p>
-                </div>
-              </div>
-              <div className={styles.comment}>
-                <div className={styles.commentRate}>
-                  <h2>4</h2>
-                  <div className={styles.commentStars}>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="#F2994A"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className={styles.star}>
-                      <svg
-                        width="30"
-                        height="30"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
-                          fill="white"
-                          stroke="#F2994A"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.commentContent}>
-                  <div className={styles.commentHeader}>
-                    <h3>Gunel Mammadova</h3>
-                    <span className={styles.commentDate}>5 gün əvvəl</span>
-                  </div>
-                  <span className={styles.productInfo}>
-                    Yaddaş - 64, Rəng - Qara
-                  </span>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
-                    mattis viverra lacus ut et, etiam. Vel ut in nunc nunc ut sit
-                    nibh tortor sit. Consectetur sit auctor odio quis suspendisse
-                    tincidunt quis. Et tristique amet aenean nibh porttitor quis
-                    aliquam integer. Consectetur lacus, volutpat malesuada libero.
-                    Sollicitudin libero pharetra a.
-                  </p>
-                </div>
-              </div>
+              })}
             </div>
-          </div> */}
+          </div>
           <div className={styles.addComment}>
-            <form action="">
+            <h4 className={styles.commentHeader}>Rəy Bildir</h4>
+            <div className={styles.commentStars}>
+              {
+                [...Array(5)].map((el, index) => {
+                  let fillColor = index < rating ? "#F2994A" : "#FFFFFF"
+                  return <span className={styles.star}>
+                    <svg onClick={() => rateProduct(index)}
+                      width="30"
+                      height="30"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M8.85686 1.16327L11.2406 6.24123L16.5712 7.06052L12.714 11.0109L13.6243 16.5918L8.85686 13.9555L4.08944 16.5918L4.99972 11.0109L1.14258 7.06052L6.47315 6.24123L8.85686 1.16327Z"
+                        fill={fillColor}
+                        stroke="#F2994A"
+                      />
+                    </svg>
+                  </span>
+                })
+              }
+
+
+            </div>
+            <form onSubmit={addReview} onChange={changeForm}>
               <div className={styles.inputBox}>
                 <label htmlFor="name">Ad</label>
-                <input value={userInfo && userInfo.name} type="text" id="name" placeholder="Adınızı daxil edin" />
+                <input value={reviewData.name} name="name" type="text" id="name" placeholder="Adınızı daxil edin" />
               </div>
               <div className={styles.inputBox}>
                 <label htmlFor="surname">Soyad</label>
                 <input
-                value={userInfo && userInfo.surname}
+                  value={reviewData.surname}
                   type="text"
                   id="surname"
+                  name="surname"
                   placeholder="Soyadınızı daxil edin"
                 />
               </div>
               <div className={styles.textBox}>
+                <label htmlFor="comment">Rəy bildirdiyiniz məhsulu seçin</label>
+                <select name="variant">
+                  {
+                    variantOptions.map((option, index) => <option value={index}>rəng: {option.color}{option.size ? `, yaddaş: ${option.size}` : ""}</option>)
+                  }
+                </select>
+              </div>
+              <div className={styles.textBox}>
                 <label htmlFor="comment">Rəyinizi yazın</label>
                 <textarea
-                  id="comment"
+                  name="description"
+                  id="description"
                   placeholder="Rəyinizi bura yazın"
                 ></textarea>
               </div>

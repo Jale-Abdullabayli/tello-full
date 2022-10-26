@@ -2,6 +2,7 @@ class GlobalFilter {
     constructor(query, queryString) {
       this.query = query;
       this.queryString = queryString;
+     
     }
   
     filter() {
@@ -14,8 +15,12 @@ class GlobalFilter {
         (str) => `$${str}`
       );
       this.query = this.query.find(JSON.parse(newQueryStr));
-  
       
+      return this;
+    }
+
+    countOfProducts(){
+      this.query.count();
       return this;
     }
 
@@ -23,11 +28,19 @@ class GlobalFilter {
       const page = parseInt(this.queryString.page) || 1;
       const limit = parseInt(this.queryString.limit) || 6;
       const skip = (page - 1) * limit;
+      console.log(this.query)
       this.query.skip(skip).limit(limit);
   
       return this;
     }
 
+    search() {
+      if (this.queryString.search) {
+        const searchText = this.queryString.search;
+        this.query.find({ name: { $regex: searchText, $options: "i" } });
+      }
+      return this;
+    }
 
     sort() {
       if (this.queryString.sort) {

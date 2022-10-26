@@ -7,6 +7,8 @@ const productRouter = require("./routes/productRouter");
 const userRouter = require("./routes/userRouter");
 const FAQRouter=require('./routes/FAQRouter');
 const basketRouter=require('./routes/basketRouter');
+const paymentRouter=require('./routes/paymentRouter');
+const brendRouter=require('./routes/brendRouter');
 const categoryRouter=require('./routes/categoryRouter');
 const reviewRouter=require('./routes/reviewRouter');
 const variantRouter=require('./routes/variantRouter');
@@ -60,11 +62,13 @@ app.use(helmet());
 
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/FAQ", FAQRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/basket", basketRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/variants", variantRouter);
+app.use("/api/v1/brends", brendRouter);
 
 app.use((req, res, next) => {
   const message = new GlobalError(`The ${req.originalUrl} does not exist`);

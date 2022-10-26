@@ -39,7 +39,6 @@ export const updateUserAsync = createAsyncThunk(
         try {
             const response = await api.changeUserData({ name, surname, email });
             const user = JSON.parse(localStorage.getItem("auth"));
-            console.log(response.data);
             user.data.user = response.data.data.user;
             localStorage.setItem("auth", JSON.stringify(user));
             return response.data;

@@ -47,7 +47,7 @@ exports.addProductToBasket = asyncCatch(async (req, res) => {
 
         if (itemIndex > -1) {
             const productItem = basket.products[itemIndex];
-            productItem.quantity = quantity;
+            productItem.quantity = productItem.quantity+quantity;
             basket.products[itemIndex] = productItem;
         } else {
             basket.products.push({ productId, quantity, variants, price, name, photo });

@@ -63,7 +63,7 @@ const BasketCard = ({ basketProduct }) => {
         </Link>
       <div className={styles.productContent}>
         <h3 className={styles.productName}>
-          {name} {productVariants.size} {productVariants.color}
+          {name}, {productVariants.size && `${productVariants.size}, `} {productVariants.color}
         </h3>
         <p className={styles.productColor}>
           <span>Rəng:</span>

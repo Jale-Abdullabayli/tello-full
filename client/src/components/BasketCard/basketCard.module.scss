@@ -62,7 +62,7 @@
     display: flex;
     flex-wrap: wrap;
     width: 50%;
-    justify-content: space-between;
+    // justify-content: space-between;
     align-items: center;
     .productName {
       width: 100%;
@@ -87,6 +87,7 @@
     }
     .productPrice {
       display: block;
+      margin-left: 20px;
     }
   }
   .productPrice {

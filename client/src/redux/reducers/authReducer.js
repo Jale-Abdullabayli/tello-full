@@ -16,7 +16,6 @@ export const authReducer = createSlice({
     initialState,
     reducers: {
         logOutSync: (state) => {
-            console.log('hjk')
             localStorage.removeItem("auth");
             state.loading = false;
             state.auth = false;
@@ -38,6 +37,7 @@ export const authReducer = createSlice({
             state.auth = true;
             state.token = payload.data.token;
             state.profile = payload.data.user;
+            state.error=null;
         },
         [signin.pending]: (state) => {
             state.loading = true;
@@ -51,6 +51,7 @@ export const authReducer = createSlice({
             state.auth = true;
             state.token = payload.data.token;
             state.profile = payload.data.user;
+            state.error=null;
         },
          [updateUserAsync.pending]: (state) => {
             state.loading = true;
@@ -64,6 +65,7 @@ export const authReducer = createSlice({
             state.auth = true;
             state.token = payload.data.token;
             state.profile = payload.data.user;
+            state.error=null;
         }
     }
 })

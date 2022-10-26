@@ -44,7 +44,7 @@ const Basket = () => {
               <button onClick={clearBasket}>Səbəti Təmizlə</button>
             </div>
           </div>
-          <BasketCalc totalPrice={basket?.totalPrice}></BasketCalc>
+          <BasketCalc products={basket?.products} totalPrice={basket?.totalPrice}></BasketCalc>
         </div>
 
       </div>

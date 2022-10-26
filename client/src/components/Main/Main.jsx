@@ -14,7 +14,12 @@ import {
   Basket,
   Login,
 } from "../../pages";
+
 import Register from "../Register/Register";
+import ForgetPassword from "../ForgetPassword/ForgetPassword";
+import ResetPassword from '../ResetPassword/ResetPassword';
+
+
 const Main = () => {
   return (
     <div className="main">
@@ -31,6 +36,8 @@ const Main = () => {
         <Route path="login" element={<Login />}></Route>
         <Route path="register" element={<Register />}></Route>
         <Route path="basket" element={<Basket />}></Route>
+        <Route path="forgetPassword" element={<ForgetPassword />}></Route>
+        <Route path="resetPassword/:passwordToken" element={<ResetPassword />}></Route>
       </Routes>
     </div>
   );

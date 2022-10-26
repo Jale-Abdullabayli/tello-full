@@ -4,6 +4,8 @@ import { BsGoogle } from "react-icons/bs";
 import { FaFacebookF } from "react-icons/fa";
 import { signup } from "../../redux/actions/authAction";
 import { useSelector, useDispatch } from "react-redux";
+import ClipLoader from "react-spinners/ClipLoader";
+
 
 import {
   Container,
@@ -29,8 +31,9 @@ const formInit = {
 const Register = () => {
 
   const [formData, setFormData] = useState(formInit);
+  const [error, setError] = useState(null);
+  const auth = useSelector(state => state.authReducer);
 
-  const { error } = useSelector(state => state.authReducer)
   const dispatch = useDispatch()
 
   const onChangeHandler = (e) => {
@@ -46,19 +49,23 @@ const Register = () => {
     e.preventDefault();
     try {
       const response = await dispatch(signup(formData));
-      if (!response?.error) {
-        toast.success('Registered successfully');
-        navigate("/profile/order-list", { replace: true });
-
-      }
-      else {
-               toast.error(response.payload.message);
-
-      }
     } catch (err) {
 
     }
   }
+
+  useEffect(() => {
+    if (!auth.loading) {
+      if (auth.error) {
+        toast.error(auth.error);
+      }
+      if (auth.profile) {
+        toast.success('Qeydiyyat uğurla tamamlandı');
+        navigate("/profile/order-list", { replace: true });
+      }
+    }
+
+  }, [auth]);
 
   return (
     <Container>
@@ -144,7 +151,11 @@ const Register = () => {
               <input type="checkbox" name="checkbox" />
               <p> İstifadəçi şərtləri ilə razıyam</p>
             </div>
-            <button type="submit">Qeydiyyat</button>
+            <button type="submit"><span className="btnText">Qeydiyyat</span>
+              <div className="spinner">
+                <ClipLoader color={'white'} loading={auth.loading} size={20} />
+              </div>
+            </button>
           </FormStyled>
         </FormContainer>
         <AuthImg>

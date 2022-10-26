@@ -21,6 +21,7 @@
   }
 }
 .productsTop {
+  margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -38,7 +39,7 @@
     border: 1px solid #bdbdbd;
     border-radius: 8px;
     width: 176px;
-    height: 40px;
+    // height: 40px;
     padding: 10px 16px;
     &::-ms-expand {
       display: none;

@@ -16,7 +16,6 @@ function OrderDetail() {
     let orderDetail = useSelector(state => {
         return state.productByIdReducer.product;
     });
-console.log(orderDetail)
     useEffect(() => {
         dispatch(fetchProductByIdAsync('6350374ae5bc084e06871ea6'));
         window.scrollTo(0, 0);

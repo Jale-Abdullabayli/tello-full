@@ -1,5 +1,6 @@
 const FAQ = require("../model/FAQ");
 const { asyncCatch } = require("../utils/asyncCatch");
+const { deleteOne,updateOne } = require("../utils/factory");
 
 
 exports.getAllFAQ = asyncCatch(async (req, res) => {
@@ -17,8 +18,8 @@ exports.getAllFAQ = asyncCatch(async (req, res) => {
 
 exports.createFAQ = asyncCatch(async (req, res) => {
     let newFAQ = await FAQ.create({
-        title:req.body.title,
-        description:req.body.description
+        title: req.body.title,
+        description: req.body.description
     });
 
     res.json({
@@ -29,3 +30,7 @@ exports.createFAQ = asyncCatch(async (req, res) => {
     });
 
 })
+
+
+exports.updateFAQ = updateOne(FAQ);
+exports.deleteFAQ = deleteOne(FAQ);

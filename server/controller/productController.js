@@ -3,18 +3,22 @@ const GlobalFilter = require("../utils/GlobalFilter");
 const { asyncCatch } = require("../utils/asyncCatch");
 const GlobalError = require('../error/GlobalError');
 const cloudinary = require("../utils/cloudinary");
-
+const { deleteOne,updateOne } = require("../utils/factory");
 
 exports.getAllProducts = asyncCatch(async (req, res) => {
   let allProducts = new GlobalFilter(Product.find(), req.query);
-  allProducts
-    .filter().sort().paginate()
+  allProducts.search().filter().sort().paginate();
 
   const products = await allProducts.query;
 
+  let countOfProducts = new GlobalFilter(Product.find(), req.query);
+  countOfProducts.search().filter().sort().countOfProducts();
+
+  const count = await countOfProducts.query;
+
   res.json({
     success: true,
-    quantity: products.length,
+    quantity: count,
     data: {
       products
     },
@@ -41,22 +45,20 @@ exports.getOneProduct = asyncCatch(async (req, res) => {
 })
 
 
-exports.searchProducts = asyncCatch(async (req, res) => {
+exports.getPriceRange = asyncCatch(async (req, res) => {
 
-  const text = req.params.text;
-
-  const products = await Product.find({ name: { $regex: text, $options: 'i' } });
-
+  const theMostExpensive = await Product.find().sort({ price: -1 }).limit(1);
+  const cheapest = await Product.find().sort({ price: 1 }).limit(1);
 
   res.status(200).json({
     success: true,
     data: {
-      products
-    },
+      maxPrice: theMostExpensive[0].price,
+      minPrice: cheapest[0].price
+    }
   });
 
 })
-
 
 
 exports.createProduct = asyncCatch(async (req, res) => {
@@ -93,3 +95,7 @@ exports.createProduct = asyncCatch(async (req, res) => {
   });
 
 })
+
+
+exports.updateProduct = updateOne(Product);
+exports.deleteProduct = deleteOne(Product);

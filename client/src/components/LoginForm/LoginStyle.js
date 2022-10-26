@@ -73,6 +73,11 @@ export const FormStyled = styled.form`
     gap: 0.5rem;
     margin-bottom:10px;
   }
+  .spinner{
+    width:20px;
+    height:20px;
+    margin-bottom:0;
+  }
   input {
     background-color: #f2f2f2;
     outline: none;
@@ -90,6 +95,23 @@ export const FormStyled = styled.form`
     padding: 0.75rem 2.5rem;
     margin: 2rem 0;
     background-color: #2dd06e;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    .btnText{
+      margin-left:20px;
+    }
+  }
+  .forgetPassword{
+    a{
+      font-weight: 500;
+font-size: 14px;
+line-height: 16px;
+text-align: right;
+color: #2D9CDB;
+width: fit-content;
+margin-left: auto;
+    }
   }
   button:hover {
     background-color: #2db563;

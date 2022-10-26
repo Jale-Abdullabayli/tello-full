@@ -4,8 +4,10 @@ import styles from "./filterSection.module.scss";
 
 import Filter from "../Filter/Filter";
 
-const FilterSection = () => {
+const FilterSection = ({setBrends,brends}) => {
+  
   const [openFilter, setOpenFilter] = useState(false);
+
 
   return (
     <div className={styles.filterSection}>
@@ -14,7 +16,7 @@ const FilterSection = () => {
         onClick={() => setOpenFilter(!openFilter)}
       >
         <h5>Brend</h5>
-        <span className={styles.filterCount}>(4)</span>
+        {/* <span className={styles.filterCount}>(4)</span> */}
         <span className={styles.openClose}>
           <div
             className={styles.lineY}
@@ -35,7 +37,7 @@ const FilterSection = () => {
             : { height: "auto" }
         }
       >
-        <Filter></Filter>
+        <Filter setBrends={setBrends} brends={brends}></Filter>
       </div>
     </div>
   );

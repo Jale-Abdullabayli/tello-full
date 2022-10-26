@@ -13,7 +13,7 @@ const ProductCard = ({ product }) => {
         <div className={styles.productInfo}>
           <h5>{product.name}</h5>
           <div className="productPrice">
-            <del>{product.price} ₼</del>
+            {/* <del>{product.price} ₼</del> */}
             <span>{product.price} ₼</span>
           </div>
         </div>

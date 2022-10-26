@@ -10,7 +10,6 @@ function OrderList() {
 
     const dispatch = useDispatch();
     const products = useSelector(state => state.productReducer.products.slice(0, 4));
-console.log(products);
 
 const topSellings={};
     useEffect(() => {

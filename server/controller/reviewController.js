@@ -13,10 +13,10 @@ exports.getReviewsByProductId = asyncCatch(async (req, res) => {
 
 
 exports.createReview = asyncCatch(async (req, res) => {
+    console.log(req.body)
     let review = await Review.create({
         ...req.body,
         product: req.params.productId,
-        creator: req.user._id,
     });
     res.json({
         success: true,

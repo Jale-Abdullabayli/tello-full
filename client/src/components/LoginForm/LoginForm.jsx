@@ -4,6 +4,7 @@ import { FaFacebookF } from "react-icons/fa";
 import authImg from "../../assets/icons/authImg.svg";
 import { Link } from "react-router-dom";
 import { useNavigate } from 'react-router-dom'
+import ClipLoader from "react-spinners/ClipLoader";
 
 import {
   Container,
@@ -29,10 +30,9 @@ const LoginForm = () => {
 
   const [formData, setFormData] = useState(formInit);
 
-  const error = useSelector(state => state.authReducer);
-  const dispatch = useDispatch()
-  // console.log(error);
+  const auth = useSelector(state => state.authReducer);
 
+  const dispatch = useDispatch()
 
 
   const onChangeHandler = (e) => {
@@ -43,29 +43,28 @@ const LoginForm = () => {
     e.preventDefault();
     try {
       const response = await dispatch(signin(formData));
-      // console.log(error)
-      // console.log(response);
 
-      if (!response?.error) {
-        toast.success('Logined successfully');
-        navigate("/profile/order-list", { replace: true });
-      }
-      else {
-        // console.log(response.payload.message)
-        toast.error(response.payload.message);
-      }
-      return response;
     } catch (err) {
-
     }
   }
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+
   useEffect(() => {
-    console.log(error);
-  }, [error]);
+    if (!auth.loading) {
+      if (auth.error) {
+        toast.error(auth.error);
+      }
+      if (auth.profile) {
+        toast.success('Hesaba daxil olundu');
+        navigate("/profile/order-list", { replace: true });
+      }
+    }
+
+  }, [auth]);
+
   return (
     <Container>
 
@@ -110,7 +109,10 @@ const LoginForm = () => {
                 placeholder="***********"
               />
             </div>
-            <button>Daxil ol</button>
+            <div className="forgetPassword"><Link to='/forgetPassword'>Şifrəni unutmusunuz?</Link></div>
+            <button><span className="btnText">Daxil ol </span>  <div className="spinner">
+              <ClipLoader color={'white'} loading={auth.loading} size={20} />
+            </div></button>
           </FormStyled>
         </FormContainer>
         <AuthImg>

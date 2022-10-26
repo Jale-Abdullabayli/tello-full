@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 import axios from '../../api/index';
 
 
-const Products = () => {
+const Products = ({ maxAndMin,brends }) => {
   const [showSorting, setShowSorting] = useState(false);
   const [showFiltering, setShowFiltering] = useState(false);
   const [products, setProducts] = useState([]);
@@ -32,14 +32,37 @@ const Products = () => {
 
 
   const getProductsByCategory = async () => {
-    setCountOfProducts(category?.countOfProducts);
-    const response = await axios.get(`/products?category=${category?._id}&page=${+page}&sort=${sortText}`);
+    let query=`/products?category=${category?._id}&page=${+page}&sort=${sortText}&price[gte]=${maxAndMin?.min}&price[lte]=${maxAndMin?.max}`;
+   if(brends.length!==0){
+    brends.forEach(brend => {
+      query+=`&brend=${brend}`;
+    });
+   }
+    const response = await axios.get(query);
     setProducts(response.data.data.products);
+    setCountOfProducts(response.data.quantity);
+
   }
+
+  function sortProducts(e) {
+    setSortText(e.target.value);
+    changePage(1);
+  }
+
 
   useEffect(() => {
     getProductsByCategory();
-  }, [category,sortText]);
+    changePage(1);
+  }, [brends]);
+
+  useEffect(() => {
+    getProductsByCategory();
+    changePage(1);
+  }, [maxAndMin]);
+
+  useEffect(() => {
+    getProductsByCategory();
+  }, [category, sortText]);
 
 
   useEffect(() => {
@@ -98,10 +121,10 @@ const Products = () => {
         <p className={styles.productsCount}>{countOfProducts} məhsul tapıldı</p>
         <select
           className={`${styles.mySelectMenu}  ${showSorting && styles.active}`}
-          onChange={(e) => setSortText(e.target.value)}
+          onChange={sortProducts}
         >
-          <option value="price">from cheap to expensive</option>
-          <option value="-price">From expensive to cheap</option>
+          <option value="price">Ucuzdan bahaya</option>
+          <option value="-price">Bahadan ucuza</option>
         </select>
       </div>
       <div className={styles.products}>

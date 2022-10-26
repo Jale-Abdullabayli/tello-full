@@ -29,6 +29,11 @@ const productSchema = mongoose.Schema({
     ref: "category",
     required: [true, "Category id must be defined!"]
   }],
+  brend: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "brend",
+    required: [true, "Brend id must be defined!"]
+  },
 
   ratingsQuantity: {
     type: Number,
@@ -72,9 +77,9 @@ productSchema.post("save", function (doc) {
 });
 
 
-productSchema.post(/^findOneAnd/, async function (doc) {
-  doc.constructor.calcCountOfProductsByCategory(this.category);
-});
+// productSchema.post(/^findOneAnd/, async function (doc) {
+//   doc.constructor.calcCountOfProductsByCategory(this.category);
+// });
 
 productSchema.pre("save", async function (next) {
   for (let i = 0; i < this.variants.length; i++) {

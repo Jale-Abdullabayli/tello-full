@@ -25,7 +25,7 @@ const Header = ({ setHamMenu }) => {
   let interval;
 
   async function searchProducts(value) {
-    const response = await axios.get(`/products/search/${value}`);
+    const response = await axios.get(`/products?search=${value}`);
     setProducts(response?.data?.data?.products);
   }
 
@@ -124,8 +124,11 @@ const Header = ({ setHamMenu }) => {
               showResults &&
               products?.map((product) => (
                 <Link to={`/productContent/${product.id}`} className={styles.searchResult}>
-                  <img src={product.imageCover} alt="productImg" />
-                  <h3 className='name'>{`${product.name},`} </h3>
+                  <div className={styles.productImg}><img src={product.imageCover} alt={product.name} /></div>
+                  <div className={styles.details}>
+                    <div class={styles.productName}>{product.name}</div>
+                    <div class={styles.price}>{product.price} AZN</div>
+                  </div>
                 </Link>
               ))
             }
@@ -136,11 +139,11 @@ const Header = ({ setHamMenu }) => {
           {!authReducer.auth ? <Link to="/login">
             <User />
           </Link> :
-          <Link to="/profile/order-list">
-           <span> {authReducer?.profile?.name}</span>
-          <User />
-        </Link>}
-          
+            <Link to="/profile/order-list">
+              <span className={styles.username}> {authReducer?.profile?.name.charAt(0).toUpperCase() + authReducer?.profile?.name.slice(1)}</span>
+              <User />
+            </Link>}
+
           {/* Fav */}
           <Favorite />
           <Link to='basket'>
@@ -159,7 +162,7 @@ const Header = ({ setHamMenu }) => {
                   fill="#4F4F4F"
                 />
               </svg>
-              <span>{basket?.totalCount}</span>
+              <span>{basket?.totalCount ? basket?.totalCount : 0}</span>
             </div>
           </Link>
         </div>

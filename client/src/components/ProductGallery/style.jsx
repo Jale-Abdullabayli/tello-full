@@ -17,6 +17,7 @@ const StyleImageGallery = styled.div`
     height: 26.59px;
   }
   .image-gallery-image {
+    object-fit:contain;
     width: 152.36px;
     height: 214.97px;
     box-sizing: content-box;
@@ -44,7 +45,6 @@ const StyleImageGallery = styled.div`
     .image-gallery-image {
       width: 275px;
       height: 388px;
-      padding: 4.9rem;
     }
     .image-gallery-svg {
       width: 48px;

@@ -5,13 +5,17 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import {store} from './redux';
 import { Provider } from "react-redux";
+import ScrollToTop from './ScrollToTop'
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
   <BrowserRouter>
     <React.StrictMode>
+    <ScrollToTop>
       <App />
+      </ScrollToTop>
+
     </React.StrictMode>
   </BrowserRouter>
   </Provider>

@@ -17,7 +17,6 @@ export const getBasketAsync = createAsyncThunk(
 export const addToBasketAsync = createAsyncThunk(
     'basket/addToBasketAsync',
     async (basketData) => {
-        console.log(basketData);
         try {
             const response = await axios.post('/basket', basketData);
             return response.data.data.basket;

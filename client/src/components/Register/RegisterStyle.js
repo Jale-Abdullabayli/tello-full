@@ -82,6 +82,10 @@ export const FormStyled = styled.form`
       outline: none;
     }
   }
+  .spinner{
+    width:20px;
+    height:20px;
+  }
   div {
     display: flex;
     flex-direction: column;
@@ -105,6 +109,12 @@ export const FormStyled = styled.form`
     padding: 0.75rem 2.5rem;
     margin: 2rem 0;
     background-color: #2dd06e;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    .btnText{
+      margin-left:20px;
+    }
   }
   button:hover {
     background-color: #2db563;
